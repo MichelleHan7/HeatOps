@@ -12,6 +12,7 @@ TEMPERATURE_PATH = ROOT / "data" / "temperature_matrix.json"
 
 SLOT_MINUTES = 15
 HEAT_THRESHOLD = 32.0
+DELAY_PENALTY_PER_HOUR = 0.15
 
 
 def time_to_minutes(time_string):
@@ -142,7 +143,20 @@ def optimize_schedule():
                 start
             )
 
-            costs[(job["id"], start)] = heat_load
+            earliest_start = time_to_minutes(
+                job["earliest_start"]
+            )
+
+            delay_hours = (
+                start - earliest_start
+            ) / 60
+
+            operational_cost = (
+                heat_load
+                + DELAY_PENALTY_PER_HOUR * delay_hours
+            )
+
+            costs[(job["id"], start)] = operational_cost
 
         # Every job must be scheduled exactly once
         model.Add(sum(job_variables) == 1)
