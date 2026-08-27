@@ -1,8 +1,0 @@
-requests
-python-dotenv
-shapely
-ortools
-
-[dev]
-pytest
-ruff
