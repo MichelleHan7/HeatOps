@@ -1,119 +1,110 @@
-import json
-from pathlib import Path
-
-from heatops.optimization.scheduler import (
-    calculate_heat_load,
-    minutes_to_time,
-    time_to_minutes,
+from heatops.domain.models import (
+    Job,
+    ScheduleAssignment,
+    TemperatureMatrix,
 )
-
-ROOT = Path(__file__).resolve().parents[3]
-
-JOBS_PATH = ROOT / "data" / "sample_jobs.json"
+from heatops.domain.time_utils import time_to_minutes
+from heatops.optimization.scheduler import calculate_heat_load
 
 
-with open(JOBS_PATH, "r") as f:
-    jobs = json.load(f)
-
-
-def build_baseline_schedule():
+def build_baseline_schedule(
+    jobs: list[Job],
+    temperature_matrix: TemperatureMatrix,
+    worker_id: str = "CREW-001",
+) -> list[ScheduleAssignment]:
     """
     Temperature-unaware Earliest Deadline First (EDF).
 
     At each point in time:
-    1. Find all jobs that are currently available.
-    2. Among them, choose the job with the earliest deadline.
-    3. If no job is available, advance to the next release time.
+    1. Find all jobs currently available.
+    2. Choose the job with the earliest deadline.
+    3. Break deadline ties using priority.
+    4. If nothing is available, advance to the next release time.
 
-    The scheduler does NOT use temperature information.
+    Temperature is used only after scheduling to evaluate
+    the resulting heat exposure. It does not influence
+    scheduling decisions.
     """
 
-    unscheduled = jobs.copy()
+    if not jobs:
+        return []
+
+    unscheduled = list(jobs)
 
     current_time = min(
-        time_to_minutes(job["earliest_start"])
+        time_to_minutes(job.earliest_start)
         for job in unscheduled
     )
 
     schedule = []
 
     while unscheduled:
-
         available_jobs = [
             job
             for job in unscheduled
-            if time_to_minutes(job["earliest_start"]) <= current_time
+            if (
+                time_to_minutes(
+                    job.earliest_start
+                )
+                <= current_time
+            )
         ]
 
         if not available_jobs:
             current_time = min(
-                time_to_minutes(job["earliest_start"])
+                time_to_minutes(
+                    job.earliest_start
+                )
                 for job in unscheduled
             )
             continue
 
         job = min(
             available_jobs,
-            key=lambda job: (
-                time_to_minutes(job["deadline"]),
-                -job["priority"]
-            )
+            key=lambda candidate: (
+                time_to_minutes(
+                    candidate.deadline
+                ),
+                -candidate.priority,
+            ),
         )
 
         start = current_time
-        end = start + job["duration_minutes"]
+        end = (
+            start
+            + job.duration_minutes
+        )
 
-        deadline = time_to_minutes(job["deadline"])
+        deadline = time_to_minutes(
+            job.deadline
+        )
 
         if end > deadline:
             raise RuntimeError(
-                f'Baseline cannot schedule {job["id"]} '
-                f'before its deadline.'
+                f"Baseline cannot schedule "
+                f"{job.id} before its deadline."
             )
 
-        heat_load, average_temperature = calculate_heat_load(
-            job,
-            start
+        heat_load, average_temperature = (
+            calculate_heat_load(
+                job,
+                start,
+                temperature_matrix,
+            )
         )
 
-        schedule.append({
-            "id": job["id"],
-            "name": job["name"],
-            "start": minutes_to_time(start),
-            "end": minutes_to_time(end),
-            "average_temperature": average_temperature,
-            "heat_load": heat_load
-        })
+        schedule.append(
+            ScheduleAssignment(
+                job_id=job.id,
+                worker_id=worker_id,
+                start_minute=start,
+                end_minute=end,
+                temperature_c=average_temperature,
+                heat_load=heat_load,
+            )
+        )
 
         current_time = end
         unscheduled.remove(job)
 
     return schedule
-
-if __name__ == "__main__":
-
-    schedule = build_baseline_schedule()
-
-    print("\nTEMPERATURE-UNAWARE BASELINE SCHEDULE")
-    print("=" * 80)
-
-    total_heat_load = 0
-
-    for item in schedule:
-
-        total_heat_load += item["heat_load"]
-
-        print(
-            f'{item["start"]}-{item["end"]} | '
-            f'{item["id"]} | '
-            f'{item["name"]:<25} | '
-            f'{item["average_temperature"]:.2f}°C | '
-            f'Heat Load: {item["heat_load"]:.2f}'
-        )
-
-    print("=" * 80)
-
-    print(
-        f"Total Heat Load Score: "
-        f"{total_heat_load:.2f}"
-    )

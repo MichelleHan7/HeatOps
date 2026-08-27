@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import TypedDict
 
 
 @dataclass(frozen=True)
@@ -44,5 +45,9 @@ class ScheduleAssignment:
     temperature_c: float
     heat_load: float
 
+class TemperatureRecord(TypedDict):
+    name: str
+    temperatures: dict[str, float]
 
-TemperatureMatrix = dict[str, dict[str, float]]
+
+TemperatureMatrix = dict[str, TemperatureRecord]
