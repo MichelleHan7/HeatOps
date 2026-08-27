@@ -3,3 +3,10 @@ venv/
 __pycache__/
 .DS_Store
 *.pyc
+
+# Python packaging artifacts
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
