@@ -1,6 +1,5 @@
-from baseline import build_baseline_schedule
-from scheduler import optimize_schedule
-
+from heatops.optimization.baseline import build_baseline_schedule
+from heatops.optimization.scheduler import optimize_schedule
 
 baseline = build_baseline_schedule()
 optimized = optimize_schedule()

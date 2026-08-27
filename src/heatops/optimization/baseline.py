@@ -1,14 +1,13 @@
 import json
 from pathlib import Path
 
-from scheduler import (
+from heatops.optimization.scheduler import (
     calculate_heat_load,
+    minutes_to_time,
     time_to_minutes,
-    minutes_to_time
 )
 
-
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[3]
 
 JOBS_PATH = ROOT / "data" / "sample_jobs.json"
 

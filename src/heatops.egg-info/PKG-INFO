@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: heatops
+Version: 0.1.0
+Summary: Heat-aware field operations optimization powered by hyperlocal temperature intelligence
+Requires-Python: >=3.11
+Requires-Dist: requests
+Requires-Dist: python-dotenv
+Requires-Dist: shapely
+Requires-Dist: ortools
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: ruff; extra == "dev"

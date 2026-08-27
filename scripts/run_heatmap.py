@@ -1,10 +1,9 @@
 import json
 from pathlib import Path
 
-from fortyguard_client import FortyGuardClient
-from aoi import build_aoi_from_jobs
-from temperature_matcher import match_jobs_to_temperatures
-
+from heatops.integrations.aoi import build_aoi_from_jobs
+from heatops.integrations.fortyguard import FortyGuardClient
+from heatops.integrations.temperature_matcher import match_jobs_to_temperatures
 
 ROOT = Path(__file__).resolve().parent.parent
 JOBS_PATH = ROOT / "data" / "sample_jobs.json"
@@ -35,7 +34,7 @@ activity_id = client.create_heatmap(
     granularity=100,
 )
 
-print(f"\nSubmitted heatmap.")
+print("\nSubmitted heatmap.")
 print(f"Activity ID: {activity_id}")
 
 

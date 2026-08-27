@@ -1,11 +1,9 @@
 import json
 from pathlib import Path
-from datetime import datetime, timedelta
 
 from ortools.sat.python import cp_model
 
-
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[3]
 
 JOBS_PATH = ROOT / "data" / "sample_jobs.json"
 TEMPERATURE_PATH = ROOT / "data" / "temperature_matrix.json"
