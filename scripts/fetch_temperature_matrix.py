@@ -1,110 +1,86 @@
+import argparse
 import json
+import sys
 from pathlib import Path
 
-from heatops.integrations.aoi import build_aoi_from_jobs
-from heatops.integrations.fortyguard import FortyGuardClient
-from heatops.integrations.temperature_matcher import match_jobs_to_temperatures
+from heatops.domain.loaders import load_jobs
+from heatops.domain.time_utils import minutes_to_time, time_to_minutes
+from heatops.integrations.temperature_service import (
+    TemperatureServiceError,
+    fetch_temperature_data,
+)
 
-ROOT = Path(__file__).resolve().parent.parent
-JOBS_PATH = ROOT / "data" / "sample_jobs.json"
-
-
-# Development date:
-# use historical data first so results are reproducible
-DATE = "2026-08-24"
-
-TIME_SLOTS = [
-    "08:00",
-    "09:00",
-    "10:00",
-    "11:00",
-    "12:00",
-    "13:00",
-    "14:00",
-    "15:00",
-    "16:00",
-    "17:00",
-    "18:00",
-    "19:00",
-]
+ROOT = Path(__file__).resolve().parents[1]
 
 
-with open(JOBS_PATH, "r") as f:
-    jobs = json.load(f)
-
-
-polygon_aoi = build_aoi_from_jobs(jobs)
-
-client = FortyGuardClient()
-
-
-temperature_matrix = {
-    job["id"]: {
-        "name": job["name"],
-        "temperatures": {}
-    }
-    for job in jobs
-}
-
-
-for time_slot in TIME_SLOTS:
-    print(f"\n=== Fetching {DATE} {time_slot} ===")
-
-    activity_id = client.create_heatmap(
-        polygon_aoi=polygon_aoi,
-        start_date=DATE,
-        start_time=time_slot,
-        granularity=100,
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="Fetch and cache a validated FortyGuard temperature matrix."
     )
-
-    result = client.wait_for_result(activity_id)
-
-    features = result["map_data"]["features"]
-
-    matched_jobs = match_jobs_to_temperatures(
-        jobs,
-        features
+    parser.add_argument(
+        "--jobs",
+        type=Path,
+        default=ROOT / "data" / "sample_jobs.json",
     )
+    parser.add_argument("--date", default="2026-08-24")
+    parser.add_argument("--start-time", default="08:00")
+    parser.add_argument("--end-time", default="19:00")
+    parser.add_argument("--granularity", type=int, default=100)
+    parser.add_argument(
+        "--cache-dir",
+        type=Path,
+        default=ROOT / "data" / "cache",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=ROOT / "data" / "temperature_matrix.json",
+    )
+    parser.add_argument("--no-cache-fallback", action="store_true")
+    return parser
 
-    for job in matched_jobs:
-        temperature_matrix[job["id"]]["temperatures"][time_slot] = (
-            job["temperature"]
+
+def _hourly_slots(start_time: str, end_time: str) -> list[str]:
+    start = time_to_minutes(start_time)
+    end = time_to_minutes(end_time)
+
+    if start % 60 or end % 60:
+        raise ValueError("start-time and end-time must be on the hour.")
+
+    if start > end:
+        raise ValueError("start-time must not be after end-time.")
+
+    return [minutes_to_time(minute) for minute in range(start, end + 1, 60)]
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
+
+    try:
+        jobs = load_jobs(args.jobs)
+        time_slots = _hourly_slots(args.start_time, args.end_time)
+        result = fetch_temperature_data(
+            jobs,
+            args.date,
+            time_slots,
+            cache_dir=args.cache_dir,
+            granularity=args.granularity,
+            allow_cache_fallback=not args.no_cache_fallback,
         )
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(
+            json.dumps(result.matrix, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        print(
+            f"Saved {result.metadata.source} temperature matrix to {args.output} "
+            f"(data date: {result.metadata.data_date})."
+        )
+        return 0
+    except (KeyError, OSError, TemperatureServiceError, TypeError, ValueError) as error:
+        print(f"Temperature fetch failed: {error}", file=sys.stderr)
+        return 2
 
 
-print("\n\nTEMPERATURE MATRIX")
-print("=" * 80)
-
-header = f'{"Job":<12}'
-for time_slot in TIME_SLOTS:
-    header += f'{time_slot:>10}'
-
-print(header)
-
-
-for job in jobs:
-    job_id = job["id"]
-
-    row = f'{job_id:<12}'
-
-    for time_slot in TIME_SLOTS:
-        temp = temperature_matrix[job_id]["temperatures"][time_slot]
-
-        if temp is None:
-            row += f'{"N/A":>10}'
-        else:
-            row += f'{temp:>9.2f}°'
-
-    print(row)
-
-
-output_path = ROOT / "data" / "temperature_matrix.json"
-
-with open(output_path, "w") as f:
-    json.dump(
-        temperature_matrix,
-        f,
-        indent=2
-    )
-
-print(f"\nSaved matrix to: {output_path}")
+if __name__ == "__main__":
+    raise SystemExit(main())

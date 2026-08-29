@@ -1,0 +1,62 @@
+[
+  {
+    "id": "JOB-001",
+    "name": "Transformer Inspection",
+    "latitude": 33.4486,
+    "longitude": -112.074,
+    "duration_minutes": 60,
+    "earliest_start": "09:00",
+    "deadline": "15:00",
+    "priority": 3,
+    "required_skill": "electrical",
+    "physical_intensity": 1.2
+  },
+  {
+    "id": "JOB-002",
+    "name": "Utility Pole Inspection",
+    "latitude": 33.452,
+    "longitude": -112.0685,
+    "duration_minutes": 45,
+    "earliest_start": "09:00",
+    "deadline": "17:00",
+    "priority": 2,
+    "required_skill": "inspection",
+    "physical_intensity": 1.4
+  },
+  {
+    "id": "JOB-003",
+    "name": "Meter Maintenance",
+    "latitude": 33.445,
+    "longitude": -112.064,
+    "duration_minutes": 60,
+    "earliest_start": "10:00",
+    "deadline": "18:00",
+    "priority": 2,
+    "required_skill": "maintenance",
+    "physical_intensity": 1.3
+  },
+  {
+    "id": "JOB-004",
+    "name": "Substation Check",
+    "latitude": 33.4415,
+    "longitude": -112.071,
+    "duration_minutes": 90,
+    "earliest_start": "08:00",
+    "deadline": "16:00",
+    "priority": 3,
+    "required_skill": "electrical",
+    "physical_intensity": 1.1
+  },
+  {
+    "id": "JOB-005",
+    "name": "Equipment Inspection",
+    "latitude": 33.449,
+    "longitude": -112.061,
+    "duration_minutes": 45,
+    "earliest_start": "11:00",
+    "deadline": "19:00",
+    "priority": 1,
+    "required_skill": "inspection",
+    "physical_intensity": 1.5
+  }
+]
