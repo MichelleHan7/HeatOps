@@ -1,0 +1,29 @@
+[
+  {
+    "id": "CREW-001",
+    "name": "Crew Alpha",
+    "start_latitude": 33.4484,
+    "start_longitude": -112.074,
+    "shift_start": "08:00",
+    "shift_end": "19:00",
+    "skills": [
+      "electrical",
+      "inspection",
+      "maintenance"
+    ],
+    "acclimatization": 1.0
+  },
+  {
+    "id": "CREW-002",
+    "name": "Crew Bravo",
+    "start_latitude": 33.455,
+    "start_longitude": -112.065,
+    "shift_start": "08:00",
+    "shift_end": "18:00",
+    "skills": [
+      "inspection",
+      "maintenance"
+    ],
+    "acclimatization": 0.8
+  }
+]

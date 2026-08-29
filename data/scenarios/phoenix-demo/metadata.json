@@ -1,0 +1,49 @@
+{
+  "scenario_id": "phoenix-demo",
+  "display_name": "Phoenix Utility Field Operations",
+  "location": {
+    "city": "Phoenix",
+    "state": "Arizona",
+    "country": "United States",
+    "timezone": "America/Phoenix"
+  },
+  "temperature_data": {
+    "provider": "FortyGuard",
+    "source": "repository_api_snapshot",
+    "data_date": "2026-08-24",
+    "time_slots": [
+      "08:00",
+      "09:00",
+      "10:00",
+      "11:00",
+      "12:00",
+      "13:00",
+      "14:00",
+      "15:00",
+      "16:00",
+      "17:00",
+      "18:00",
+      "19:00"
+    ],
+    "granularity_meters": 100,
+    "source_file": "data/temperature_matrix.json",
+    "source_sha256": "e6080bde546f89b238b43a85826e51d11dc6f03bd3694835e4281dc0f134eab2",
+    "provenance": "Copied without alteration from the repository's existing FortyGuard ingestion snapshot. No API activity identifiers were retained in the original fixture."
+  },
+  "operational_assumptions": {
+    "description": "Hackathon demo jobs, time windows, priorities, skills, and physical-intensity multipliers model a single Phoenix utility crew's workday.",
+    "selected_worker_id": "CREW-001",
+    "heat_threshold_c": 30.0,
+    "slot_minutes": 15
+  },
+  "aoi": {
+    "padding_degrees": 0.005,
+    "bounds": {
+      "minimum_latitude": 33.4365,
+      "maximum_latitude": 33.457,
+      "minimum_longitude": -112.079,
+      "maximum_longitude": -112.056
+    }
+  },
+  "disclaimer": "HeatOps Heat Load is an operational planning score, not a medical risk assessment."
+}

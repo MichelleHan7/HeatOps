@@ -15,6 +15,9 @@ dependencies = [
     "ortools",
 ]
 
+[project.scripts]
+heatops-evaluate = "heatops.cli:main"
+
 [project.optional-dependencies]
 dev = [
     "pytest>=8",
@@ -29,6 +32,14 @@ demo = [
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.data-files]
+"share/heatops/data/scenarios/phoenix-demo" = [
+    "data/scenarios/phoenix-demo/jobs.json",
+    "data/scenarios/phoenix-demo/metadata.json",
+    "data/scenarios/phoenix-demo/temperature_matrix.json",
+    "data/scenarios/phoenix-demo/workers.json",
+]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
