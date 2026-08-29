@@ -1,317 +1,236 @@
+from dataclasses import dataclass
+
 from ortools.sat.python import cp_model
 
+from heatops.domain.config import SchedulerConfig
 from heatops.domain.models import (
     Job,
+    OptimizationResult,
     OptimizationWeights,
     ScheduleAssignment,
     TemperatureMatrix,
+    Worker,
 )
 from heatops.domain.time_utils import time_to_minutes
-
-SLOT_MINUTES = 15
-HEAT_THRESHOLD = 32.0
+from heatops.optimization.heat_risk import HeatLoadResult, calculate_heat_load
 
 
-def get_temperature(
-    job_id: str,
-    minute: int,
-    temperature_matrix: TemperatureMatrix,
-) -> float:
-    """
-    Linearly interpolate temperature between hourly FortyGuard observations.
-    """
-
-    temperatures = temperature_matrix[job_id]["temperatures"]
-
-    hour = minute // 60
-    minute_in_hour = minute % 60
-
-    current_hour = f"{hour:02d}:00"
-
-    if current_hour not in temperatures:
-        raise ValueError(
-            f"Temperature data is missing for {job_id} at {current_hour}."
-        )
-
-    if minute_in_hour == 0:
-        return temperatures[current_hour]
-
-    next_hour = f"{hour + 1:02d}:00"
-
-    if next_hour not in temperatures:
-        raise ValueError(
-            f"Temperature data is missing for {job_id} at {next_hour}."
-        )
-
-    t1 = temperatures[current_hour]
-    t2 = temperatures[next_hour]
-
-    fraction = minute_in_hour / 60
-
-    return t1 + fraction * (t2 - t1)
+@dataclass(frozen=True)
+class _Candidate:
+    job: Job
+    start_minute: int
+    start_index: int
+    variable: cp_model.IntVar
+    heat: HeatLoadResult
+    delay_hours: float
+    priority_weighted_delay: float
 
 
-def calculate_heat_load(
-    job: Job,
-    start_minute: int,
-    temperature_matrix: TemperatureMatrix,
-) -> tuple[float, float]:
-    """
-    Calculate the project-specific operational Heat Load Score.
+def _normalized_value(value: float, minimum: float, maximum: float) -> float:
+    if maximum == minimum:
+        return 0.0
 
-    For each time period:
+    return (value - minimum) / (maximum - minimum)
 
-        heat load =
-            degrees above threshold
-            × exposure duration in hours
 
-    This is NOT a medical risk score.
-    It is an operational optimization metric.
-    """
+def _validate_job_ids(jobs: list[Job]) -> None:
+    job_ids = [job.id for job in jobs]
 
-    total_load = 0.0
-    temperatures = []
+    if len(job_ids) != len(set(job_ids)):
+        raise ValueError("Job ids must be unique.")
 
-    remaining_minutes = job.duration_minutes
-    offset = 0
 
-    while remaining_minutes > 0:
-        interval_minutes = min(
-            SLOT_MINUTES,
-            remaining_minutes,
-        )
+def _validate_worker_skills(jobs: list[Job], worker: Worker | None) -> None:
+    if worker is None:
+        return
 
-        minute = start_minute + offset
+    worker_skills = set(worker.skills)
 
-        temperature = get_temperature(
-            job.id,
-            minute,
-            temperature_matrix,
-        )
-
-        temperatures.append(temperature)
-
-        heat_above_threshold = max(
-            temperature - HEAT_THRESHOLD,
-            0.0,
-        )
-
-        total_load += (
-            heat_above_threshold
-            * interval_minutes
-            / 60
-        )
-
-        offset += interval_minutes
-        remaining_minutes -= interval_minutes
-
-    average_temperature = (
-        sum(temperatures) / len(temperatures)
-    )
-
-    return total_load, average_temperature
+    for job in jobs:
+        if job.required_skill and job.required_skill not in worker_skills:
+            raise RuntimeError(
+                f"{worker.id} does not have the required skill "
+                f"{job.required_skill!r} for {job.id}."
+            )
 
 
 def optimize_schedule(
     jobs: list[Job],
     temperature_matrix: TemperatureMatrix,
     weights: OptimizationWeights | None = None,
-    worker_id: str = "CREW-001",
-    shift_start: str = "08:00",
-    shift_end: str = "19:00",
-) -> list[ScheduleAssignment]:
-    """
-    Build a single-crew heat-aware schedule.
+    worker: Worker | None = None,
+    config: SchedulerConfig | None = None,
+) -> OptimizationResult:
+    """Build a deterministic, single-crew heat-aware schedule.
 
-    Each job:
-    - is scheduled exactly once,
-    - stays inside its allowed time window,
-    - stays inside the crew shift,
-    - cannot overlap another job.
-
-    The objective balances heat exposure and operational delay.
+    The objective combines scenario-normalized heat exposure and
+    priority-weighted operational delay. Raw metrics remain available on the
+    returned result. Heat Load is an operational score, not a medical risk
+    assessment.
     """
+
+    config = config or SchedulerConfig()
+    weights = weights or OptimizationWeights()
 
     if not jobs:
-        return []
+        return OptimizationResult(
+            assignments=(),
+            status="OPTIMAL",
+            objective_value=0.0,
+            total_heat_load=0.0,
+            total_delay_hours=0.0,
+        )
 
-    if weights is None:
-        weights = OptimizationWeights()
+    _validate_job_ids(jobs)
+    _validate_worker_skills(jobs, worker)
+
+    shift_start = time_to_minutes(
+        worker.shift_start if worker else config.default_shift_start
+    )
+    shift_end = time_to_minutes(
+        worker.shift_end if worker else config.default_shift_end
+    )
+    worker_id = worker.id if worker else config.default_worker_id
 
     model = cp_model.CpModel()
-
-    shift_start_minute = time_to_minutes(shift_start)
-    shift_end_minute = time_to_minutes(shift_end)
-
-    variables: dict[
-        tuple[str, int],
-        cp_model.IntVar,
-    ] = {}
-
-    costs: dict[
-        tuple[str, int],
-        float,
-    ] = {}
-
-    # --------------------------------
-    # Create possible start decisions
-    # --------------------------------
+    candidates: list[_Candidate] = []
+    candidates_by_job: dict[str, list[_Candidate]] = {}
+    optional_intervals = []
 
     for job in jobs:
-        job_earliest = max(
+        earliest_start = max(
             time_to_minutes(job.earliest_start),
-            shift_start_minute,
+            shift_start,
         )
-
-        job_latest_end = min(
+        latest_end = min(
             time_to_minutes(job.deadline),
-            shift_end_minute,
+            shift_end,
         )
+        latest_start = latest_end - job.duration_minutes
 
-        latest_start = (
-            job_latest_end
-            - job.duration_minutes
-        )
-
-        if latest_start < job_earliest:
+        if latest_start < earliest_start:
             raise RuntimeError(
-                f"{job.id} cannot fit inside its "
-                "time window and crew shift."
+                f"{job.id} cannot fit inside its time window and worker shift."
             )
 
-        possible_starts = range(
-            job_earliest,
-            latest_start + 1,
-            SLOT_MINUTES,
-        )
+        job_candidates = []
 
-        job_variables = []
-
-        for start in possible_starts:
-            variable = model.NewBoolVar(
-                f"{job.id}_{start}"
+        for start_index, start in enumerate(
+            range(
+                earliest_start,
+                latest_start + 1,
+                config.slot_minutes,
             )
-
-            variables[(job.id, start)] = variable
-            job_variables.append(variable)
-
-            heat_load, _ = calculate_heat_load(
+        ):
+            variable = model.NewBoolVar(f"select_{job.id}_{start}")
+            interval = model.NewOptionalFixedSizeIntervalVar(
+                start,
+                job.duration_minutes,
+                variable,
+                f"interval_{job.id}_{start}",
+            )
+            heat = calculate_heat_load(
                 job,
                 start,
                 temperature_matrix,
+                config,
+            )
+            delay_hours = (start - time_to_minutes(job.earliest_start)) / 60
+            candidate = _Candidate(
+                job=job,
+                start_minute=start,
+                start_index=start_index,
+                variable=variable,
+                heat=heat,
+                delay_hours=delay_hours,
+                priority_weighted_delay=delay_hours * job.priority,
             )
 
-            delay_hours = (
-                start
-                - time_to_minutes(job.earliest_start)
-            ) / 60
+            candidates.append(candidate)
+            job_candidates.append(candidate)
+            optional_intervals.append(interval)
 
-            operational_cost = (
-                weights.heat * heat_load
-                + weights.delay * delay_hours
-            )
+        model.Add(sum(item.variable for item in job_candidates) == 1)
+        candidates_by_job[job.id] = job_candidates
 
-            costs[(job.id, start)] = operational_cost
+    model.AddNoOverlap(optional_intervals)
 
-        # Every job must be scheduled exactly once.
-        model.Add(sum(job_variables) == 1)
+    heat_values = [item.heat.heat_load for item in candidates]
+    delay_values = [item.priority_weighted_delay for item in candidates]
+    heat_minimum, heat_maximum = min(heat_values), max(heat_values)
+    delay_minimum, delay_maximum = min(delay_values), max(delay_values)
+    heat_weight, delay_weight = weights.normalized()
 
-    # --------------------------------
-    # One crew: jobs cannot overlap
-    # --------------------------------
+    max_total_start_index = sum(
+        max(item.start_index for item in job_candidates)
+        for job_candidates in candidates_by_job.values()
+    )
+    tie_break_scale = max_total_start_index + 1
+    integer_costs: dict[tuple[str, int], int] = {}
+    normalized_costs: dict[tuple[str, int], float] = {}
 
-    for minute in range(
-        shift_start_minute,
-        shift_end_minute,
-        SLOT_MINUTES,
-    ):
-        active_variables = []
+    for item in candidates:
+        normalized_heat = _normalized_value(
+            item.heat.heat_load,
+            heat_minimum,
+            heat_maximum,
+        )
+        normalized_delay = _normalized_value(
+            item.priority_weighted_delay,
+            delay_minimum,
+            delay_maximum,
+        )
+        normalized_cost = (
+            heat_weight * normalized_heat + delay_weight * normalized_delay
+        )
+        primary_cost = round(normalized_cost * config.objective_scale)
+        key = (item.job.id, item.start_minute)
 
-        for job in jobs:
-            for (
-                job_id,
-                start,
-            ), variable in variables.items():
-                if job_id != job.id:
-                    continue
-
-                if (
-                    start
-                    <= minute
-                    < start + job.duration_minutes
-                ):
-                    active_variables.append(variable)
-
-        if active_variables:
-            model.Add(
-                sum(active_variables) <= 1
-            )
-
-    # --------------------------------
-    # Objective
-    # --------------------------------
-
-    scale = 1000
+        normalized_costs[key] = normalized_cost
+        integer_costs[key] = primary_cost * tie_break_scale + item.start_index
 
     model.Minimize(
         sum(
-            round(costs[key] * scale) * variable
-            for key, variable in variables.items()
+            integer_costs[(item.job.id, item.start_minute)] * item.variable
+            for item in candidates
         )
     )
-
-    # --------------------------------
-    # Solve
-    # --------------------------------
 
     solver = cp_model.CpSolver()
+    solver.parameters.max_time_in_seconds = config.solver_time_limit_seconds
+    solver.parameters.num_search_workers = 1
+    solver.parameters.random_seed = config.random_seed
     status = solver.Solve(model)
 
-    if status not in (
-        cp_model.OPTIMAL,
-        cp_model.FEASIBLE,
-    ):
-        raise RuntimeError(
-            "No feasible schedule found."
-        )
+    if status not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
+        raise RuntimeError("No feasible schedule found.")
 
-    schedule = []
+    assignments = []
+    selected_candidates = []
 
-    for job in jobs:
-        for (
-            job_id,
-            start,
-        ), variable in variables.items():
-            if (
-                job_id == job.id
-                and solver.Value(variable)
-            ):
-                heat_load, average_temperature = (
-                    calculate_heat_load(
-                        job,
-                        start,
-                        temperature_matrix,
-                    )
+    for item in candidates:
+        if solver.Value(item.variable):
+            assignments.append(
+                ScheduleAssignment(
+                    job_id=item.job.id,
+                    worker_id=worker_id,
+                    start_minute=item.start_minute,
+                    end_minute=item.start_minute + item.job.duration_minutes,
+                    temperature_c=item.heat.average_temperature_c,
+                    heat_load=item.heat.heat_load,
                 )
+            )
+            selected_candidates.append(item)
 
-                schedule.append(
-                    ScheduleAssignment(
-                        job_id=job.id,
-                        worker_id=worker_id,
-                        start_minute=start,
-                        end_minute=(
-                            start
-                            + job.duration_minutes
-                        ),
-                        temperature_c=average_temperature,
-                        heat_load=heat_load,
-                    )
-                )
+    assignments.sort(key=lambda assignment: assignment.start_minute)
 
-    schedule.sort(
-        key=lambda assignment: (
-            assignment.start_minute
-        )
+    return OptimizationResult(
+        assignments=tuple(assignments),
+        status=solver.StatusName(status),
+        objective_value=sum(
+            normalized_costs[(item.job.id, item.start_minute)]
+            for item in selected_candidates
+        ),
+        total_heat_load=sum(item.heat.heat_load for item in selected_candidates),
+        total_delay_hours=sum(item.delay_hours for item in selected_candidates),
     )
-
-    return schedule

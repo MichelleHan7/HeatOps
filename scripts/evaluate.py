@@ -3,6 +3,7 @@ from pathlib import Path
 from heatops.domain.loaders import (
     load_jobs,
     load_temperature_matrix,
+    load_workers,
 )
 from heatops.domain.time_utils import (
     minutes_to_time,
@@ -16,86 +17,57 @@ from heatops.optimization.scheduler import (
 
 ROOT = Path(__file__).resolve().parents[1]
 
-JOBS_PATH = (
-    ROOT
-    / "data"
-    / "sample_jobs.json"
-)
+JOBS_PATH = ROOT / "data" / "sample_jobs.json"
 
-TEMPERATURE_PATH = (
-    ROOT
-    / "data"
-    / "temperature_matrix.json"
-)
+TEMPERATURE_PATH = ROOT / "data" / "temperature_matrix.json"
+
+WORKERS_PATH = ROOT / "data" / "sample_workers.json"
 
 
 jobs = load_jobs(JOBS_PATH)
 
-temperature_matrix = (
-    load_temperature_matrix(
-        TEMPERATURE_PATH
-    )
-)
+temperature_matrix = load_temperature_matrix(TEMPERATURE_PATH)
+
+worker = load_workers(WORKERS_PATH)[0]
 
 
-baseline = build_baseline_schedule(
+baseline_result = build_baseline_schedule(
     jobs,
     temperature_matrix,
+    worker=worker,
 )
 
-optimized = optimize_schedule(
+optimized_result = optimize_schedule(
     jobs,
     temperature_matrix,
+    worker=worker,
 )
 
+baseline = baseline_result.assignments
+optimized = optimized_result.assignments
 
-baseline_heat_load = sum(
-    item.heat_load
-    for item in baseline
-)
 
-optimized_heat_load = sum(
-    item.heat_load
-    for item in optimized
-)
+baseline_heat_load = baseline_result.total_heat_load
+optimized_heat_load = optimized_result.total_heat_load
 
 
 if baseline_heat_load > 0:
-    reduction = (
-        (
-            baseline_heat_load
-            - optimized_heat_load
-        )
-        / baseline_heat_load
-        * 100
-    )
+    reduction = (baseline_heat_load - optimized_heat_load) / baseline_heat_load * 100
 else:
     reduction = 0.0
 
 
-job_names = {
-    job.id: job.name
-    for job in jobs
-}
+job_names = {job.id: job.name for job in jobs}
 
 
 print("\nHEATOPS EVALUATION")
 print("=" * 60)
 
-print(
-    f"Baseline Heat Load : "
-    f"{baseline_heat_load:.2f}"
-)
+print(f"Baseline Heat Load : {baseline_heat_load:.2f}")
 
-print(
-    f"HeatOps Heat Load  : "
-    f"{optimized_heat_load:.2f}"
-)
+print(f"HeatOps Heat Load  : {optimized_heat_load:.2f}")
 
-print(
-    f"Heat Load Reduction: "
-    f"{reduction:.1f}%"
-)
+print(f"Heat Load Reduction: {reduction:.1f}%")
 
 print("=" * 60)
 

@@ -1,4 +1,1 @@
-requests
-python-dotenv
-shapely
-ortools
+-e .[demo]

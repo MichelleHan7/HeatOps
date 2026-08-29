@@ -1,5 +1,6 @@
 .env
 venv/
+.venv/
 __pycache__/
 .DS_Store
 *.pyc
@@ -10,3 +11,6 @@ build/
 dist/
 .pytest_cache/
 .ruff_cache/
+.coverage
+htmlcov/
+.streamlit/secrets.toml
