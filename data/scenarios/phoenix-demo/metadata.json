@@ -33,7 +33,7 @@
   "operational_assumptions": {
     "description": "Hackathon demo jobs, time windows, priorities, skills, and physical-intensity multipliers model a single Phoenix utility crew's workday.",
     "selected_worker_id": "CREW-001",
-    "heat_threshold_c": 30.0,
+    "heat_threshold_c": 32.0,
     "slot_minutes": 15
   },
   "aoi": {

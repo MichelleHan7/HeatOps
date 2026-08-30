@@ -1,0 +1,44 @@
+{
+  "project_name": "HeatOps",
+  "tagline": "Heat-aware field operations planning powered by FortyGuard hyperlocal temperature intelligence.",
+  "repository_url": "https://github.com/MichelleHan7/HeatOps",
+  "demo": {
+    "command": "streamlit run app.py",
+    "hosted_url": null
+  },
+  "video": {
+    "required_duration_minutes": [
+      2,
+      5
+    ],
+    "url": null,
+    "script": "docs/video-script.md"
+  },
+  "documentation": {
+    "submission": "docs/submission.md",
+    "architecture": "docs/architecture.md",
+    "demo_guide": "docs/demo-guide.md",
+    "fortyguard_api": "docs/api-integration.md"
+  },
+  "scenario_evidence": {
+    "scenario_id": "phoenix-demo",
+    "temperature_provider": "FortyGuard",
+    "temperature_data_date": "2026-08-24",
+    "preset": "heat_first",
+    "heat_threshold_c": 32.0,
+    "baseline_heat_load": 40.38,
+    "optimized_heat_load": 39.18,
+    "heat_load_reduction_percent": 2.97,
+    "jobs_moved": 3,
+    "jobs_total": 5,
+    "claim_scope": "Deterministic Phoenix demo scenario evidence; not a universal outcome or medical risk assessment."
+  },
+  "deliverable_status": {
+    "working_prototype": "ready",
+    "code_repository": "ready",
+    "written_summary": "ready",
+    "fortyguard_api_documentation": "ready",
+    "hosted_demo": "pending",
+    "video": "pending"
+  }
+}
