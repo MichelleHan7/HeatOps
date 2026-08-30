@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "feature/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install project and quality tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[demo,dev]"
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Check formatting
+        run: ruff format --check .
+
+      - name: Run test suite
+        run: pytest -q
+
+      - name: Compile Python sources
+        run: python -m compileall -q src app.py scripts tests
+
+      - name: Smoke-test installed CLI
+        run: |
+          heatops-evaluate --mode heat_first --format json > /tmp/heatops-result.json
+          python -c 'import json; p=json.load(open("/tmp/heatops-result.json")); assert p["comparison"]["optimized_result"]["status"] in {"OPTIMAL", "FEASIBLE"}'

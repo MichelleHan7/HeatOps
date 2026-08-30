@@ -26,11 +26,9 @@ client = FortyGuardClient()
 
 activity_id = client.create_heatmap(
     polygon_aoi=polygon_aoi,
-
     # Historical test first, so we don't hit the +12h forecast limit.
     start_date="2026-08-24",
     start_time="14:00",
-
     granularity=100,
 )
 
@@ -55,10 +53,7 @@ print(json.dumps(stats_data, indent=2))
 print("\nFirst heatmap feature:")
 print(json.dumps(features[0], indent=2))
 
-matched_jobs = match_jobs_to_temperatures(
-    jobs,
-    features
-)
+matched_jobs = match_jobs_to_temperatures(jobs, features)
 
 print("\nJob temperatures:")
 
@@ -66,15 +61,8 @@ for job in matched_jobs:
     temperature = job["temperature"]
 
     if temperature is None:
-        print(
-            f'{job["id"]} | '
-            f'{job["name"]} | '
-            f'No matching temperature tile'
-        )
+        print(f"{job['id']} | {job['name']} | No matching temperature tile")
     else:
         print(
-            f'{job["id"]} | '
-            f'{job["name"]} | '
-            f'{temperature:.2f}°C | '
-            f'Tile {job["tile_id"]}'
+            f"{job['id']} | {job['name']} | {temperature:.2f}°C | Tile {job['tile_id']}"
         )

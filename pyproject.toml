@@ -24,10 +24,10 @@ dev = [
     "ruff>=0.6",
 ]
 demo = [
-    "altair>=5",
-    "pandas>=2",
-    "pydeck>=0.9",
-    "streamlit>=1.37",
+    "altair>=5,<7",
+    "pandas>=2,<4",
+    "pydeck>=0.9,<1",
+    "streamlit>=1.62,<2",
 ]
 
 [tool.setuptools.packages.find]
