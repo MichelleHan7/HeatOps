@@ -139,4 +139,4 @@ the checksum and scenario copy.
 The current single-crew model is deliberate hackathon scope. Later work can add
 multiple crew assignment, travel time, breaks, rolling replanning, or persistent
 scenario storage behind the existing domain and evaluation boundaries. Those
-features are not part of Steps 12–16 and are not implemented in this submission.
+extensions are intentionally outside the current prototype scope.

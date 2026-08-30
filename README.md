@@ -4,6 +4,8 @@
 [![CI](https://github.com/MichelleHan7/HeatOps/actions/workflows/ci.yml/badge.svg)](https://github.com/MichelleHan7/HeatOps/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB.svg)](https://www.python.org/)
 
+**[Launch the live demo →](https://heatops-fortyguard.streamlit.app/)**
+
 **Heat-aware field operations planning powered by FortyGuard hyperlocal
 temperature intelligence.**
 
@@ -126,8 +128,8 @@ The repository separates facts from scenario assumptions:
   multipliers are explicit hackathon demo assumptions.
 - The baseline and HeatOps schedule share the same solver and constraints. The
   only difference is whether temperature contributes to the objective.
-- Submission metrics are machine-checked against the scenario in
-  `tests/test_submission_artifacts.py`.
+- Scenario integrity and optimization outcomes are exercised by
+  `tests/test_phoenix_demo_scenario.py`.
 
 ## Project structure
 
@@ -140,9 +142,8 @@ src/heatops/evaluation/        Comparable metrics and job-level explanations
 src/heatops/presentation.py    UI-neutral chart and card records
 data/scenarios/phoenix-demo/   Reproducible jobs, crew, metadata, and temperatures
 scripts/                       Data-fetch and evaluation entry points
-tests/                         Unit, integration, scenario, UI, and artifact tests
-docs/                          Architecture, demo, API, and submission guidance
-submission/                    Machine-readable submission manifest
+tests/                         Unit, integration, scenario, and UI tests
+docs/                          Architecture and FortyGuard API documentation
 ```
 
 ## Quality gates
@@ -161,14 +162,10 @@ The tests do not call the live FortyGuard API. Network behavior is exercised
 through controlled fakes, while the end-to-end scenario and Streamlit smoke
 test use repository fixtures.
 
-## Submission package
+## Technical documentation
 
-- [Demo guide](docs/demo-guide.md)
 - [Architecture](docs/architecture.md)
 - [FortyGuard API integration](docs/api-integration.md)
-- [Copy-ready project submission](docs/submission.md)
-- [2–5 minute video script](docs/video-script.md)
-- [Machine-readable manifest](submission/heatops-submission.json)
 
 ## Current scope
 
