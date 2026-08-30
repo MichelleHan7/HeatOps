@@ -71,17 +71,18 @@ All policy modes, including the baseline, use these same constraints.
 
 ### Operational Heat Load Score
 
-For each 15-minute interval `i` of job `j`, the modeled contribution is:
+For a candidate that starts job $j$ at time $s$, the modeled Heat Load is:
 
-\[
-L_{j,i} = \max(T_{j,i} - T_{threshold}, 0)
-          \times \frac{minutes_i}{60}
-          \times intensity_j
-\]
+$$
+H_{j,s} = I_j \sum_{i \in \mathcal{I}(j,s)}
+          \max(T_{j,i} - \tau, 0)
+          \frac{\Delta t_i}{60}
+$$
 
-The job score is the sum of its interval contributions; the schedule score is
-the sum across jobs. Temperatures at quarter-hour starts are linearly
-interpolated from the hourly matrix. The runtime threshold is 32 °C.
+Here, $I_j$ is the job's physical-intensity multiplier, $T_{j,i}$ is the
+interpolated temperature during interval $i$, $\Delta t_i$ is the interval
+length in minutes, and $\tau = 32\,^{\circ}\mathrm{C}$ is the runtime threshold.
+The schedule score is the sum of the selected jobs' candidate scores.
 
 This is a transparent operational planning score. It is not WBGT, a medical
 risk model, a regulatory limit, or a prediction of injury.
@@ -89,12 +90,17 @@ risk model, a regulatory limit, or a prediction of injury.
 ### Objective
 
 Each candidate's Heat Load and priority-weighted delay are independently
-normalized over the scenario's candidate ranges. HeatOps minimizes:
+normalized over the scenario's candidate ranges. Conceptually, HeatOps
+minimizes:
 
-\[
-weight_{heat} \times normalized\_heat
-+ weight_{delay} \times normalized\_priority\_delay
-\]
+$$
+\min \sum_{c \in \mathcal{C}} x_c
+     \left(w_h \widehat{H}_c + w_d \widehat{D}_c\right)
+$$
+
+Here, $c$ is a candidate job/start-time pair, $x_c$ is 1 when that candidate is
+selected, $\widehat{H}_c$ and $\widehat{D}_c$ are normalized Heat Load and
+priority-weighted delay, and $w_h$ and $w_d$ are the selected policy weights.
 
 Integer scaling makes the objective compatible with CP-SAT. A small,
 deterministic start-index tie-break and fixed solver seed make results stable
