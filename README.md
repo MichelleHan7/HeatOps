@@ -9,10 +9,10 @@
 **Heat-aware field operations planning powered by FortyGuard hyperlocal
 temperature intelligence.**
 
-HeatOps turns location- and time-specific temperature data into an actionable
+HeatOps uses location- and time-specific temperature data to create a 
 field schedule. It compares an operations-first baseline with a heat-aware
-schedule, makes the heat-versus-delay trade-off explicit, and explains every
-job that moved.
+schedule, outlines the heat-versus-delay trade-off explicitly, and explains the reason why the 
+job moved.
 
 The current demo models one Phoenix utility crew and five field jobs. On the
 bundled, traceable FortyGuard snapshot, the **Heat-first** preset reduces the
@@ -25,10 +25,9 @@ jobs**. Heat Load is a planning metric, not a medical risk assessment.
 - Side-by-side baseline and optimized timelines.
 - Hyperlocal temperature curves and a field-location map.
 - A visible Heat Load, delay, idle-time, and threshold-exposure comparison.
-- Plain-language, job-level explanations for every scheduling change.
+- Explanations for every scheduling change.
 - Optional live FortyGuard refresh with validated cache and snapshot fallback.
-- A deterministic OR-Tools CP-SAT optimizer and a fair, temperature-unaware
-  baseline using the same feasibility constraints.
+- A deterministic OR-Tools CP-SAT optimizer and a baseline using the same feasibility constraints.
 
 ## How it works
 
@@ -44,10 +43,8 @@ flowchart TD
 ```
 
 The optimizer generates feasible 15-minute start-time candidates for every
-job, enforces time windows, shift boundaries, worker skills, and non-overlap,
-then minimizes a configurable combination of normalized Heat Load and
-priority-weighted delay. See [Architecture](docs/architecture.md) for the
-formula, constraints, baseline design, and component boundaries.
+job, enforces time windows, shift boundaries, worker skills, and nonoverlapping constraints,
+then minimizes a configurable combination of normalized Heat Load and delay with weighted priority. See [Architecture](docs/architecture.md) for detailed design.
 
 ## Quick start
 
@@ -75,8 +72,7 @@ heatops-evaluate --heat-priority 75
 ```
 
 Valid presets are `operations_first`, `balanced`, and `heat_first`. The custom
-control assigns the selected percentage to Heat Load and the remainder to
-priority-weighted delay.
+control assigns the selected percentage to Heat Load and the remainder to delay with weighted priority.
 
 ## Live FortyGuard data
 
