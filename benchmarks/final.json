@@ -1,0 +1,79 @@
+{
+  "suite": "held-out-v1",
+  "registered_before_evaluation": true,
+  "solver_time_limit_seconds": 30,
+  "additional_weighted_delay_minutes": 60,
+  "configurations": [
+    {
+      "label": "main",
+      "jobs": 10,
+      "crews": 2,
+      "families": [
+        "mild",
+        "hot",
+        "variable",
+        "flat",
+        "spatial"
+      ],
+      "seed_start": 10000,
+      "instances": 30,
+      "travel": false,
+      "solver_time_limit_seconds": 5
+    },
+    {
+      "label": "scaling",
+      "jobs": 5,
+      "crews": 1,
+      "families": [
+        "hot"
+      ],
+      "seed_start": 20000,
+      "instances": 3,
+      "travel": false
+    },
+    {
+      "label": "scaling",
+      "jobs": 25,
+      "crews": 5,
+      "families": [
+        "hot"
+      ],
+      "seed_start": 20000,
+      "instances": 3,
+      "travel": false
+    },
+    {
+      "label": "scaling",
+      "jobs": 50,
+      "crews": 5,
+      "families": [
+        "hot"
+      ],
+      "seed_start": 20000,
+      "instances": 3,
+      "travel": false
+    },
+    {
+      "label": "scaling",
+      "jobs": 100,
+      "crews": 10,
+      "families": [
+        "hot"
+      ],
+      "seed_start": 20000,
+      "instances": 3,
+      "travel": false
+    },
+    {
+      "label": "travel",
+      "jobs": 5,
+      "crews": 2,
+      "families": [
+        "hot"
+      ],
+      "seed_start": 30000,
+      "instances": 3,
+      "travel": true
+    }
+  ]
+}
