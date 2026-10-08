@@ -1,0 +1,211 @@
+{
+  "comparison": {
+    "baseline_metrics": {
+      "idle_minutes": 0,
+      "minutes_above_threshold": 300,
+      "peak_temperature_c": 39.940025,
+      "priority_weighted_delay_hours": 8.25,
+      "scheduled_jobs": 5,
+      "total_delay_hours": 4.5,
+      "total_heat_load": 40.382715624999996
+    },
+    "baseline_result": {
+      "assignments": [
+        {
+          "end_minute": 570,
+          "heat_load": 7.118230624999999,
+          "job_id": "JOB-004",
+          "start_minute": 480,
+          "temperature_c": 36.31407916666667,
+          "worker_id": "CREW-001"
+        },
+        {
+          "end_minute": 630,
+          "heat_load": 7.367025000000002,
+          "job_id": "JOB-001",
+          "start_minute": 570,
+          "temperature_c": 38.139187500000006,
+          "worker_id": "CREW-001"
+        },
+        {
+          "end_minute": 675,
+          "heat_load": 7.38381,
+          "job_id": "JOB-002",
+          "start_minute": 630,
+          "temperature_c": 39.0322,
+          "worker_id": "CREW-001"
+        },
+        {
+          "end_minute": 735,
+          "heat_load": 9.707993749999998,
+          "job_id": "JOB-003",
+          "start_minute": 675,
+          "temperature_c": 39.4676875,
+          "worker_id": "CREW-001"
+        },
+        {
+          "end_minute": 780,
+          "heat_load": 8.80565625,
+          "job_id": "JOB-005",
+          "start_minute": 735,
+          "temperature_c": 39.82725,
+          "worker_id": "CREW-001"
+        }
+      ],
+      "objective_value": 0.4230769230769231,
+      "status": "OPTIMAL",
+      "total_delay_hours": 4.5,
+      "total_heat_load": 40.382715625
+    },
+    "heat_load_reduction_percent": 2.9714847835966847,
+    "job_changes": [
+      {
+        "baseline_heat_load": 7.367025000000002,
+        "baseline_start_minute": 570,
+        "baseline_temperature_c": 38.139187500000006,
+        "explanation": "JOB-001 moved later from 09:30 to 10:15, changing its scheduled temperature by +0.78 C and increasing its operational Heat Load by 0.94.",
+        "heat_load_delta": 0.9368999999999978,
+        "job_id": "JOB-001",
+        "moved": true,
+        "optimized_heat_load": 8.303925,
+        "optimized_start_minute": 615,
+        "optimized_temperature_c": 38.919937499999996,
+        "start_delta_minutes": 45,
+        "temperature_delta_c": 0.7807499999999905
+      },
+      {
+        "baseline_heat_load": 7.38381,
+        "baseline_start_minute": 630,
+        "baseline_temperature_c": 39.0322,
+        "explanation": "JOB-002 moved earlier from 10:30 to 09:30, changing its scheduled temperature by -1.07 C and reducing its operational Heat Load by 1.13.",
+        "heat_load_delta": -1.1271224999999987,
+        "job_id": "JOB-002",
+        "moved": true,
+        "optimized_heat_load": 6.256687500000002,
+        "optimized_start_minute": 570,
+        "optimized_temperature_c": 37.95875,
+        "start_delta_minutes": -60,
+        "temperature_delta_c": -1.0734500000000011
+      },
+      {
+        "baseline_heat_load": 9.707993749999998,
+        "baseline_start_minute": 675,
+        "baseline_temperature_c": 39.4676875,
+        "explanation": "JOB-003 stayed at 11:15; the selected optimization mode did not move it.",
+        "heat_load_delta": 0.0,
+        "job_id": "JOB-003",
+        "moved": false,
+        "optimized_heat_load": 9.707993749999998,
+        "optimized_start_minute": 675,
+        "optimized_temperature_c": 39.4676875,
+        "start_delta_minutes": 0,
+        "temperature_delta_c": 0.0
+      },
+      {
+        "baseline_heat_load": 7.118230624999999,
+        "baseline_start_minute": 480,
+        "baseline_temperature_c": 36.31407916666667,
+        "explanation": "JOB-004 stayed at 08:00; the selected optimization mode did not move it.",
+        "heat_load_delta": 0.0,
+        "job_id": "JOB-004",
+        "moved": false,
+        "optimized_heat_load": 7.118230624999999,
+        "optimized_start_minute": 480,
+        "optimized_temperature_c": 36.31407916666667,
+        "start_delta_minutes": 0,
+        "temperature_delta_c": 0.0
+      },
+      {
+        "baseline_heat_load": 8.80565625,
+        "baseline_start_minute": 735,
+        "baseline_temperature_c": 39.82725,
+        "explanation": "JOB-005 moved later from 12:15 to 18:15, changing its scheduled temperature by -0.90 C and reducing its operational Heat Load by 1.01.",
+        "heat_load_delta": -1.0097437500000037,
+        "job_id": "JOB-005",
+        "moved": true,
+        "optimized_heat_load": 7.7959124999999965,
+        "optimized_start_minute": 1095,
+        "optimized_temperature_c": 38.9297,
+        "start_delta_minutes": 360,
+        "temperature_delta_c": -0.8975500000000025
+      }
+    ],
+    "moved_jobs": 3,
+    "optimized_metrics": {
+      "idle_minutes": 360,
+      "minutes_above_threshold": 300,
+      "peak_temperature_c": 39.6046,
+      "priority_weighted_delay_hours": 14.5,
+      "scheduled_jobs": 5,
+      "total_delay_hours": 10.25,
+      "total_heat_load": 39.182749375
+    },
+    "optimized_result": {
+      "assignments": [
+        {
+          "end_minute": 570,
+          "heat_load": 7.118230624999999,
+          "job_id": "JOB-004",
+          "start_minute": 480,
+          "temperature_c": 36.31407916666667,
+          "worker_id": "CREW-001"
+        },
+        {
+          "end_minute": 615,
+          "heat_load": 6.256687500000002,
+          "job_id": "JOB-002",
+          "start_minute": 570,
+          "temperature_c": 37.95875,
+          "worker_id": "CREW-001"
+        },
+        {
+          "end_minute": 675,
+          "heat_load": 8.303925,
+          "job_id": "JOB-001",
+          "start_minute": 615,
+          "temperature_c": 38.919937499999996,
+          "worker_id": "CREW-001"
+        },
+        {
+          "end_minute": 735,
+          "heat_load": 9.707993749999998,
+          "job_id": "JOB-003",
+          "start_minute": 675,
+          "temperature_c": 39.4676875,
+          "worker_id": "CREW-001"
+        },
+        {
+          "end_minute": 1140,
+          "heat_load": 7.7959124999999965,
+          "job_id": "JOB-005",
+          "start_minute": 1095,
+          "temperature_c": 38.9297,
+          "worker_id": "CREW-001"
+        }
+      ],
+      "objective_value": 1.4531819076431105,
+      "status": "OPTIMAL",
+      "total_delay_hours": 10.25,
+      "total_heat_load": 39.18274937499999
+    }
+  },
+  "mode": "heat_first",
+  "weights": {
+    "delay": 0.0,
+    "heat": 1.0
+  },
+  "worker": {
+    "acclimatization": 1.0,
+    "id": "CREW-001",
+    "name": "Crew Alpha",
+    "shift_end": "19:00",
+    "shift_start": "08:00",
+    "skills": [
+      "electrical",
+      "inspection",
+      "maintenance"
+    ],
+    "start_latitude": 33.4484,
+    "start_longitude": -112.074
+  }
+}
