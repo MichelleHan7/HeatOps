@@ -147,3 +147,13 @@ def test_impossible_travel_and_safeguard():
     s = generate_scenario(50, 5)
     with pytest.raises(ValueError, match="at most"):
         solve(s, travel=TravelConfig(enabled=True))
+
+
+def test_legacy_single_worker_honors_new_availability_field():
+    from heatops.optimization.scheduler import optimize_schedule
+
+    s = generate_scenario(1, 1)
+    s.jobs = [replace(s.jobs[0], deadline="19:00")]
+    w = replace(s.workers[0], unavailable=(("07:00", "08:00"),))
+    r = optimize_schedule(s.jobs, s.temperature_matrix, worker=w)
+    assert r.assignments[0].start_minute >= 480

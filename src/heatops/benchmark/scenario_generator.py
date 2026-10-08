@@ -8,9 +8,61 @@ from pathlib import Path
 
 from heatops.domain.models import Job, ScheduleAssignment, Worker
 from heatops.domain.time_utils import minutes_to_time as label
+from heatops.domain.time_utils import time_to_minutes
 from heatops.optimization.heat_risk import calculate_heat_load
 
 FAMILIES = ("mild", "hot", "variable", "flat", "spatial")
+
+
+@dataclass(frozen=True)
+class GeneratorSettings:
+    """Optional controls; defaults preserve registered generator-v1 workloads."""
+
+    shift_start: str = "07:00"
+    shift_end: str = "19:00"
+    duration_choices: tuple[int, ...] = (15, 30, 45, 60)
+    max_priority: int = 3
+    intensity_min: float = 0.8
+    intensity_max: float = 2.0
+    center_latitude: float = 33.45
+    center_longitude: float = -112.07
+    location_spread_degrees: float = 0.035
+    early_slack_slots: int = 8
+    late_slack_slots: int = 16
+    skills: tuple[str, ...] = ("general", "electrical", "water")
+    temperature_mean_c: float | None = None
+    temperature_amplitude_c: float | None = None
+
+    def __post_init__(self):
+        start, end = time_to_minutes(self.shift_start), time_to_minutes(self.shift_end)
+        if start >= end or start % 15 or end % 15:
+            raise ValueError("Generator shifts must align to 15-minute slots")
+        if not self.duration_choices or any(
+            not isinstance(x, int) or x <= 0 or x % 15 for x in self.duration_choices
+        ):
+            raise ValueError("Durations must be positive multiples of 15 minutes")
+        if (
+            self.max_priority < 1
+            or self.early_slack_slots < 0
+            or self.late_slack_slots < 1
+        ):
+            raise ValueError("Invalid priority or window slack")
+        if not 0 < self.intensity_min <= self.intensity_max or not math.isfinite(
+            self.intensity_max
+        ):
+            raise ValueError("Invalid intensity range")
+        if not 0 <= self.location_spread_degrees <= 1:
+            raise ValueError("Location spread must be between 0 and 1 degree")
+        if len(self.skills) < 2 or any(not x.strip() for x in self.skills):
+            raise ValueError("Provide a general skill and at least one specialty")
+        for value in (self.temperature_mean_c, self.temperature_amplitude_c):
+            if value is not None and not math.isfinite(value):
+                raise ValueError("Temperature controls must be finite")
+        if (
+            self.temperature_amplitude_c is not None
+            and self.temperature_amplitude_c < 0
+        ):
+            raise ValueError("Temperature amplitude must be nonnegative")
 
 
 @dataclass
@@ -43,7 +95,15 @@ def scenario_from_dict(payload):
     return scenario
 
 
-def generate_scenario(n_jobs=10, n_crews=2, seed=0, family="hot", *, infeasible=False):
+def generate_scenario(
+    n_jobs=10, n_crews=2, seed=0, family="hot", *, infeasible=False, settings=None
+):
+    custom_settings = settings is not None
+    settings = settings or GeneratorSettings()
+    shift_start, shift_end = (
+        time_to_minutes(settings.shift_start),
+        time_to_minutes(settings.shift_end),
+    )
     if (
         not isinstance(n_jobs, int)
         or not isinstance(n_crews, int)
@@ -59,11 +119,11 @@ def generate_scenario(n_jobs=10, n_crews=2, seed=0, family="hot", *, infeasible=
         Worker(
             f"W{i:02d}",
             f"Crew {i + 1}",
-            33.45 + rng.uniform(-0.015, 0.015),
-            -112.07 + rng.uniform(-0.015, 0.015),
-            "07:00",
-            "19:00",
-            ("general", "electrical" if i % 2 == 0 else "water"),
+            settings.center_latitude + rng.uniform(-0.015, 0.015),
+            settings.center_longitude + rng.uniform(-0.015, 0.015),
+            settings.shift_start,
+            settings.shift_end,
+            (settings.skills[0], settings.skills[1 + i % (len(settings.skills) - 1)]),
         )
         for i in range(n_crews)
     ]
@@ -71,27 +131,36 @@ def generate_scenario(n_jobs=10, n_crews=2, seed=0, family="hot", *, infeasible=
     jobs, witness_starts = [], []
     for i in range(n_jobs):
         wi = i % n_crews
-        duration = rng.choice((15, 30, 45, 60))
-        start = 420 + loads[wi]
+        duration = rng.choice(settings.duration_choices)
+        start = shift_start + loads[wi]
         loads[wi] += duration
-        if start + duration > 1140:
-            raise ValueError(
-                "Workload cannot fit the constructive 12-hour shifts; add crews"
-            )
-        earliest = max(420, start - rng.randrange(0, 9) * 15)
-        deadline = min(1140, start + duration + rng.randrange(1, 17) * 15)
+        if start + duration > shift_end:
+            raise ValueError("Workload cannot fit the constructive shifts; add crews")
+        earliest = max(
+            shift_start, start - rng.randrange(0, settings.early_slack_slots + 1) * 15
+        )
+        deadline = min(
+            shift_end,
+            start + duration + rng.randrange(1, settings.late_slack_slots + 1) * 15,
+        )
         jobs.append(
             Job(
                 f"J{i:03d}",
                 f"Maintenance {i + 1}",
-                33.45 + rng.uniform(-0.035, 0.035),
-                -112.07 + rng.uniform(-0.035, 0.035),
+                settings.center_latitude
+                + rng.uniform(
+                    -settings.location_spread_degrees, settings.location_spread_degrees
+                ),
+                settings.center_longitude
+                + rng.uniform(
+                    -settings.location_spread_degrees, settings.location_spread_degrees
+                ),
                 duration,
                 label(earliest),
                 label(deadline),
-                rng.randint(1, 3),
+                rng.randint(1, settings.max_priority),
                 rng.choice(workers[wi].skills),
-                round(rng.uniform(0.8, 2), 3),
+                round(rng.uniform(settings.intensity_min, settings.intensity_max), 3),
             )
         )
         witness_starts.append((workers[wi], start))
@@ -104,11 +173,17 @@ def generate_scenario(n_jobs=10, n_crews=2, seed=0, family="hot", *, infeasible=
         "spatial": (34, 5),
     }
     mean, amplitude = parameters[family]
+    if settings.temperature_mean_c is not None:
+        mean = settings.temperature_mean_c
+    if settings.temperature_amplitude_c is not None:
+        amplitude = settings.temperature_amplitude_c
     mean += rng.uniform(-1, 1)
     phase = rng.uniform(13.5, 15.5)
     matrix = {}
     for job in jobs:
-        spatial = (job.latitude - 33.45) * 50 if family == "spatial" else 0
+        spatial = (
+            (job.latitude - settings.center_latitude) * 50 if family == "spatial" else 0
+        )
         offset = rng.uniform(-0.5, 0.5)
         matrix[job.id] = {
             "name": job.name,
@@ -153,7 +228,8 @@ def generate_scenario(n_jobs=10, n_crews=2, seed=0, family="hot", *, infeasible=
             "intended_feasible": not infeasible,
             "feasibility_scope": "scheduling_only; travel may make workload infeasible",
             "weather_model": "Seeded sinusoidal daily profile; not observations or forecasts",
-            "shift_minutes": 720,
+            "shift_minutes": shift_end - shift_start,
+            **({"generator_settings": asdict(settings)} if custom_settings else {}),
         },
         witness,
     )

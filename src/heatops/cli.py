@@ -186,6 +186,8 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _fleet_main(args):
+    if args.heat_priority is not None:
+        raise ValueError("--heat-priority is a legacy option; choose a fleet --policy")
     from heatops.benchmark.scenario_generator import scenario_from_dict
     from heatops.domain.config import SchedulerConfig
     from heatops.evaluation.fleet import compare_fleet
@@ -203,7 +205,14 @@ def _fleet_main(args):
     else:
         jobs, workers = load_jobs(args.jobs), load_workers(args.workers)
         matrix, hints = load_temperature_matrix(args.temperatures), ()
-        metadata = {"source": "file", "path": str(args.temperatures)}
+        metadata = {
+            "source": "user_supplied_unverified",
+            "path": str(args.temperatures),
+        }
+        if args.temperatures == DEFAULT_SCENARIO / "temperature_matrix.json":
+            metadata = json.loads((DEFAULT_SCENARIO / "metadata.json").read_text())[
+                "temperature_data"
+            ]
     policy = args.policy or args.mode
     comparison = compare_fleet(
         jobs,

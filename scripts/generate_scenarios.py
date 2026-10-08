@@ -1,6 +1,12 @@
 import argparse
+import json
+from pathlib import Path
 
-from heatops.benchmark.scenario_generator import FAMILIES, generate_scenario
+from heatops.benchmark.scenario_generator import (
+    FAMILIES,
+    GeneratorSettings,
+    generate_scenario,
+)
 
 
 def main():
@@ -10,8 +16,14 @@ def main():
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--family", choices=FAMILIES, default="hot")
     p.add_argument("--output", default="reports/scenario.json")
+    p.add_argument("--settings", type=Path, help="Optional GeneratorSettings JSON")
     a = p.parse_args()
-    generate_scenario(a.jobs, a.crews, a.seed, a.family).save(a.output)
+    settings = (
+        GeneratorSettings(**json.loads(a.settings.read_text())) if a.settings else None
+    )
+    generate_scenario(a.jobs, a.crews, a.seed, a.family, settings=settings).save(
+        a.output
+    )
 
 
 if __name__ == "__main__":

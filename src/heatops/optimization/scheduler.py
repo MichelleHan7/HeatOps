@@ -122,6 +122,12 @@ def optimize_schedule(
                 config.slot_minutes,
             )
         ):
+            if worker and any(
+                start < time_to_minutes(end)
+                and start + job.duration_minutes > time_to_minutes(begin)
+                for begin, end in worker.unavailable
+            ):
+                continue
             variable = model.NewBoolVar(f"select_{job.id}_{start}")
             interval = model.NewOptionalFixedSizeIntervalVar(
                 start,
@@ -150,6 +156,8 @@ def optimize_schedule(
             job_candidates.append(candidate)
             optional_intervals.append(interval)
 
+        if not job_candidates:
+            raise RuntimeError(f"{job.id} has no available start time.")
         model.Add(sum(item.variable for item in job_candidates) == 1)
         candidates_by_job[job.id] = job_candidates
 
