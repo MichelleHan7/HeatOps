@@ -43,6 +43,7 @@ def load_workers(path: str | Path) -> list[Worker]:
             shift_end=item["shift_end"],
             skills=tuple(item.get("skills", [])),
             acclimatization=item.get("acclimatization", 1.0),
+            unavailable=tuple(tuple(x) for x in item.get("unavailable", ())),
         )
         for item in raw_workers
     ]

@@ -68,8 +68,16 @@ class Worker:
     shift_end: str
     skills: tuple[str, ...]
     acclimatization: float = 1.0
+    unavailable: tuple[tuple[str, str], ...] = ()
 
     def __post_init__(self) -> None:
+        object.__setattr__(
+            self, "unavailable", tuple(tuple(x) for x in self.unavailable)
+        )
+        for start, end in self.unavailable:
+            if time_to_minutes(start) >= time_to_minutes(end):
+                raise ValueError("Unavailability must have positive duration")
+
         if isinstance(self.skills, str):
             raise TypeError(f"{self.id} skills must be a collection of strings.")
 
