@@ -167,7 +167,7 @@ def write_reports(rows, output):
             "",
             "Reduction statistics condition on valid paired solves and positive baseline heat. All attempts and undefined counts are in benchmark_summary.json. Bounds/gaps use the integer solver objective. No feasible incumbent is labeled optimal.",
             "",
-            "Reproduce: `python scripts/run_benchmarks.py --manifest benchmarks/final.json`. Detailed assignments, metrics and statuses: `reports/benchmark_details.jsonl`. Raw rows: `reports/benchmark_results.csv`. Environment, versions and source hash: `reports/benchmark_environment.json`.",
+            "Reproduce: `python scripts/run_benchmarks.py --manifest benchmarks/final.json`. Detailed assignments, metrics and statuses: `reports/benchmark_details.jsonl.gz`. Raw rows: `reports/benchmark_results.csv`. Environment, versions and source hash: `reports/benchmark_environment.json`.",
         ]
     )
     (output / "benchmark-results.md").write_text("\n".join(lines) + "\n")

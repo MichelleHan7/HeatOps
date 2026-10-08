@@ -75,5 +75,7 @@
       "instances": 3,
       "travel": true
     }
-  ]
+  ],
+  "execution_workers": 4,
+  "execution_revision": "Full rerun with four single-threaded instances; original serial partial run retained. Workloads/policies/time limits unchanged."
 }

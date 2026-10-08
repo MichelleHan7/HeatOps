@@ -49,3 +49,16 @@ not travel. Never interpret route lines as road navigation.
 Reproduction: `python scripts/run_benchmarks.py --manifest benchmarks/final.json`.
 CSV, detailed JSONL and summary JSON retain all attempts. Checkpoint resume checks
 the manifest hash and implementation source hash to prevent mixing experiments.
+
+## Execution revision
+
+The initial serial run was interrupted for turnaround time, not based on heat
+reductions. All completed records and its environment are retained under
+`reports/serial-partial/`. The final suite reruns **every** manifest instance using
+four independent processes, one CP-SAT thread each, within an 8-core container
+quota. Job counts, seeds, families, policy weights and solve budgets are unchanged.
+No serial timings are pooled with final parallel timings. Parallel timings include
+shared-host contention and are not isolated single-process latency guarantees.
+The configurable generator extension is checked against hashes from the original
+registered defaults. Gzipped detailed assignments are committed; raw JSONL remains
+a local resumable checkpoint.

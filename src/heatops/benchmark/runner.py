@@ -1,11 +1,13 @@
 """Checkpointed, paired evaluation with explicit failure rows."""
 
 import csv
+import gzip
 import hashlib
 import importlib.metadata
 import json
 import os
 import platform
+from concurrent.futures import ProcessPoolExecutor
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -48,6 +50,10 @@ def run_benchmarks(manifest, output_dir="reports", *, resume=False):
         "platform": platform.platform(),
         "logical_cpus": os.cpu_count(),
         "solver_threads": 1,
+        "execution_workers": manifest.get("execution_workers", 1),
+        "cgroup_cpu_max": Path("/sys/fs/cgroup/cpu.max").read_text().strip()
+        if Path("/sys/fs/cgroup/cpu.max").exists()
+        else None,
         "packages": {
             p: importlib.metadata.version(p) for p in ("ortools", "numpy", "heatops")
         },
@@ -76,58 +82,40 @@ def run_benchmarks(manifest, output_dir="reports", *, resume=False):
     else:
         meta_path.write_text(json.dumps(metadata, indent=2) + "\n")
         log_path.write_text("")
+    tasks = []
     for spec in manifest["configurations"]:
         for family in spec["families"]:
             for seed in range(
                 spec["seed_start"], spec["seed_start"] + spec["instances"]
             ):
                 key = f"{spec['label']}-{spec['jobs']}-{spec['crews']}-{family}-{seed}"
-                if key in completed:
-                    continue
-                try:
-                    s = generate_scenario(spec["jobs"], spec["crews"], seed, family)
-                    validate_scenario(s)
-                    cfg = SchedulerConfig(
-                        solver_time_limit_seconds=spec.get(
-                            "solver_time_limit_seconds",
-                            manifest["solver_time_limit_seconds"],
-                        )
-                    )
-                    result = compare_fleet(
-                        s.jobs,
-                        s.workers,
-                        s.temperature_matrix,
-                        config=cfg,
-                        travel=TravelConfig(enabled=spec["travel"]),
-                        initial_schedule=s.witness if not spec["travel"] else (),
-                        additional_delay_minutes=manifest[
-                            "additional_weighted_delay_minutes"
-                        ],
-                    )
-                    error = None
-                except (ValueError, TypeError, RuntimeError, KeyError, OSError) as exc:
-                    result, error = {}, f"{type(exc).__name__}: {exc}"
-                entry = {
-                    "instance_id": key,
-                    "label": spec["label"],
-                    "jobs": spec["jobs"],
-                    "crews": spec["crews"],
-                    "family": family,
-                    "seed": seed,
-                    "travel": spec["travel"],
-                    "source": "synthetic",
-                    "policies": result,
-                    "error": error,
-                }
-                with log_path.open("a") as f:
-                    f.write(json.dumps(entry, allow_nan=False) + "\n")
-                details.append(entry)
-                print(
-                    key,
-                    {p: x["result"]["status"] for p, x in result.items()},
-                    error or "",
-                    flush=True,
-                )
+                if key not in completed:
+                    tasks.append((spec, family, seed, manifest))
+    workers = manifest.get("execution_workers", 1)
+    if not isinstance(workers, int) or not 1 <= workers <= 8:
+        raise ValueError("execution_workers must be between 1 and 8")
+    if workers == 1:
+        entries = map(_run_instance, tasks)
+        executor = None
+    else:
+        executor = ProcessPoolExecutor(max_workers=workers)
+        entries = executor.map(_run_instance, tasks)
+    try:
+        for entry in entries:
+            with log_path.open("a") as f:
+                f.write(json.dumps(entry, allow_nan=False) + "\n")
+            details.append(entry)
+            print(
+                entry["instance_id"],
+                {p: x["result"]["status"] for p, x in entry["policies"].items()},
+                entry["error"] or "",
+                flush=True,
+            )
+    finally:
+        if executor is not None:
+            executor.shutdown(cancel_futures=True)
+    with gzip.open(out / "benchmark_details.jsonl.gz", "wb") as f:
+        f.write(log_path.read_bytes())
     rows = flatten(details)
     with (out / "benchmark_results.csv").open("w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=list(rows[0]) if rows else [])
@@ -137,6 +125,43 @@ def run_benchmarks(manifest, output_dir="reports", *, resume=False):
 
     write_reports(rows, out)
     return rows
+
+
+def _run_instance(task):
+    spec, family, seed, manifest = task
+    key = f"{spec['label']}-{spec['jobs']}-{spec['crews']}-{family}-{seed}"
+    try:
+        scenario = generate_scenario(spec["jobs"], spec["crews"], seed, family)
+        validate_scenario(scenario)
+        config = SchedulerConfig(
+            solver_time_limit_seconds=spec.get(
+                "solver_time_limit_seconds", manifest["solver_time_limit_seconds"]
+            )
+        )
+        result = compare_fleet(
+            scenario.jobs,
+            scenario.workers,
+            scenario.temperature_matrix,
+            config=config,
+            travel=TravelConfig(enabled=spec["travel"]),
+            initial_schedule=scenario.witness if not spec["travel"] else (),
+            additional_delay_minutes=manifest["additional_weighted_delay_minutes"],
+        )
+        error = None
+    except (ValueError, TypeError, RuntimeError, KeyError, OSError) as exc:
+        result, error = {}, f"{type(exc).__name__}: {exc}"
+    return {
+        "instance_id": key,
+        "label": spec["label"],
+        "jobs": spec["jobs"],
+        "crews": spec["crews"],
+        "family": family,
+        "seed": seed,
+        "travel": spec["travel"],
+        "source": "synthetic",
+        "policies": result,
+        "error": error,
+    }
 
 
 def flatten(details):
