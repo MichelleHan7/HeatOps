@@ -54,3 +54,9 @@ jobs:
         run: |
           heatops-evaluate --mode heat_first --format json > /tmp/heatops-result.json
           python -c 'import json; p=json.load(open("/tmp/heatops-result.json")); assert p["comparison"]["optimized_result"]["status"] in {"OPTIMAL", "FEASIBLE"}'
+
+      - name: Smoke-test fleet CLI
+        run: |
+          python scripts/generate_scenarios.py --jobs 5 --crews 2 --seed 42 --output /tmp/fleet.json
+          heatops-evaluate --scenario /tmp/fleet.json --policy delay_budget --format json > /tmp/fleet-result.json
+          python -c 'import json; p=json.load(open("/tmp/fleet-result.json")); assert p["comparison"]["delay_budget"]["metrics"]["constraint_violations"] == 0'

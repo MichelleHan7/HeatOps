@@ -488,6 +488,12 @@ def main() -> None:
         return
 
     st.title("HeatOps")
+    if st.sidebar.checkbox("Multi-crew workspace", key="fleet_workspace"):
+        from heatops.ui.fleet import render_workspace
+
+        render_workspace()
+        return
+
     st.markdown(
         "**Heat-aware field operations planning powered by FortyGuard hyperlocal "
         "temperature intelligence.**"

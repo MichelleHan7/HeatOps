@@ -14,3 +14,6 @@ dist/
 .coverage
 htmlcov/
 .streamlit/secrets.toml
+
+# Full assignments are committed as gzip; raw JSONL is a resumable local checkpoint.
+reports/benchmark_details.jsonl

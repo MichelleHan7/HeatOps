@@ -63,6 +63,21 @@ def build_parser() -> argparse.ArgumentParser:
         default="text",
         help="Output format.",
     )
+    parser.add_argument(
+        "--all-workers", action="store_true", help="Use the v2 fleet engine"
+    )
+    parser.add_argument("--scenario", type=Path, help="V2 scenario JSON bundle")
+    parser.add_argument(
+        "--policy",
+        choices=("operations_first", "heat_first", "balanced", "delay_budget"),
+    )
+    parser.add_argument(
+        "--travel", action="store_true", help="Enforce estimated travel (v2)"
+    )
+    parser.add_argument("--time-limit", type=float, default=10)
+    parser.add_argument(
+        "--delay-budget", type=int, default=60, help="Extra priority-weighted minutes"
+    )
     return parser
 
 
@@ -132,6 +147,8 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
 
     try:
+        if args.all_workers or args.scenario or args.policy or args.travel:
+            return _fleet_main(args)
         jobs = load_jobs(args.jobs)
         workers = load_workers(args.workers)
         temperature_matrix = load_temperature_matrix(args.temperatures)
@@ -166,6 +183,69 @@ def main(argv: list[str] | None = None) -> int:
     except (KeyError, OSError, RuntimeError, TypeError, ValueError) as error:
         print(f"HeatOps evaluation failed: {error}", file=sys.stderr)
         return 2
+
+
+def _fleet_main(args):
+    if args.heat_priority is not None:
+        raise ValueError("--heat-priority is a legacy option; choose a fleet --policy")
+    from heatops.benchmark.scenario_generator import scenario_from_dict
+    from heatops.domain.config import SchedulerConfig
+    from heatops.evaluation.fleet import compare_fleet
+    from heatops.optimization.travel import TravelConfig
+
+    if args.scenario:
+        scenario = scenario_from_dict(json.loads(args.scenario.read_text()))
+        jobs, workers, matrix = (
+            scenario.jobs,
+            scenario.workers,
+            scenario.temperature_matrix,
+        )
+        metadata = scenario.metadata
+        hints = scenario.witness if not args.travel else ()
+    else:
+        jobs, workers = load_jobs(args.jobs), load_workers(args.workers)
+        matrix, hints = load_temperature_matrix(args.temperatures), ()
+        metadata = {
+            "source": "user_supplied_unverified",
+            "path": str(args.temperatures),
+        }
+        if args.temperatures == DEFAULT_SCENARIO / "temperature_matrix.json":
+            metadata = json.loads((DEFAULT_SCENARIO / "metadata.json").read_text())[
+                "temperature_data"
+            ]
+    policy = args.policy or args.mode
+    comparison = compare_fleet(
+        jobs,
+        workers,
+        matrix,
+        policies=(policy,),
+        config=SchedulerConfig(solver_time_limit_seconds=args.time_limit),
+        travel=TravelConfig(enabled=args.travel),
+        additional_delay_minutes=args.delay_budget,
+        initial_schedule=hints,
+    )
+    payload = {"source": metadata, "comparison": comparison}
+    if args.format == "json":
+        print(json.dumps(payload, indent=2))
+    else:
+        for name, entry in comparison.items():
+            result = entry["result"]
+            print(
+                f"{name}: {result['status']} | jobs={len(result['assignments'])} | Heat Load={result['total_heat_load']} | weighted delay={result['weighted_delay_minutes']} min"
+            )
+            for row in result["assignments"]:
+                print(
+                    f"  {row['worker_id']} {row['job_id']} {minutes_to_time(row['start_minute'])}-{minutes_to_time(row['end_minute'])}"
+                )
+    return (
+        0
+        if all(
+            p["result"]["status"] in ("OPTIMAL", "FEASIBLE")
+            and not p["metrics"]["constraint_violations"]
+            for p in comparison.values()
+        )
+        else 2
+    )
 
 
 if __name__ == "__main__":
