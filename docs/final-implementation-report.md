@@ -75,7 +75,7 @@ python scripts/profile_scheduler.py
 
 核心分支：`feature/heatops-v2`，PR https://github.com/MichelleHan7/HeatOps/pull/3 已于 2026-10-09 01:57 UTC 在仓库侧合并，合并提交 `9a229675478fd4177db36c0c1d823b5beb3ced90`。恢复后已确认 main 的文件树与已测试核心实现一致。
 
-补充交付分支：`feature/heatops-v2-results`。本次只创建补充 PR，不直接写入 main。
+补充交付分支：`feature/heatops-v2-results`。草稿 PR：https://github.com/MichelleHan7/HeatOps/pull/4 。结果与文档提交：`b4f7e48972db75b74d729f9b279f9548d242d9ee`。本次只创建补充 PR，不直接写入 main。
 
 实现提交：
 - 6bbddba docs: audit legacy scheduler and preserve Phoenix baseline
