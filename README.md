@@ -1,172 +1,161 @@
-
-# HeatOps
+# HeatOps v2
 
 [![CI](https://github.com/MichelleHan7/HeatOps/actions/workflows/ci.yml/badge.svg)](https://github.com/MichelleHan7/HeatOps/actions/workflows/ci.yml)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776AB.svg)](https://www.python.org/)
 
-**[Launch the live demo →](https://heatops-fortyguard.streamlit.app/)**
+**Heat-aware, multi-crew field operations scheduling with reproducible evaluation.**
 
-**Heat-aware field operations planning powered by FortyGuard hyperlocal
-temperature intelligence.**
+HeatOps assigns jobs to qualified crews under time windows, shifts, availability
+and optional travel constraints using OR-Tools CP-SAT. It compares operational
+Heat Load with priority-weighted task delay. Heat Load is a modeled planning
+metric, not a medical score or evidence of prevented heat illness.
 
-HeatOps uses location- and time-specific temperature data to create a 
-field schedule. It compares an operations-first baseline with a heat-aware
-schedule, outlines the heat-versus-delay trade-off explicitly, and explains the reason why the 
-job moved.
+[Live demo](https://heatops-fortyguard.streamlit.app/) ·
+[Architecture](docs/architecture.md) · [Benchmark results](docs/benchmark-results.md) ·
+[Reproduction methodology](docs/benchmark-methodology.md)
 
-The current demo models one Phoenix utility crew and five field jobs. On the
-bundled, traceable FortyGuard snapshot, the **Heat-first** preset reduces the
-operational Heat Load Score from **40.38 to 39.18 (2.97%)** by moving **3 of 5
-jobs**. Heat Load is a planning metric, not a medical risk assessment.
+Core v2 was merged through PR #3. This follow-up branch contains the completed
+benchmark artifacts and documentation. Deployment status after that merge has
+not been independently checked. The default local page preserves Phoenix; enable
+**Multi-crew workspace** in the sidebar to use v2.
 
-## Demo highlights
+## Features
 
-- A polished Streamlit dashboard with preset and custom optimization controls.
-- Side-by-side baseline and optimized timelines.
-- Hyperlocal temperature curves and a field-location map.
-- A visible Heat Load, delay, idle-time, and threshold-exposure comparison.
-- Explanations for every scheduling change.
-- Optional live FortyGuard refresh with validated cache and snapshot fallback.
-- A deterministic OR-Tools CP-SAT optimizer and a baseline using the same feasibility constraints.
-
-## How it works
-
-```mermaid
-flowchart TD
-    FG["FortyGuard Heatmap API"] --> TS["Validated temperature service"]
-    SNAP["Traceable demo snapshot"] --> TS
-    TS --> MATRIX["Job × time temperature matrix"]
-    INPUTS["Jobs, crew, constraints"] --> OPT["CP-SAT scheduler"]
-    MATRIX --> OPT
-    OPT --> EVAL["Baseline comparison and explanations"]
-    EVAL --> UI["Streamlit dashboard and CLI"]
-```
-
-The optimizer generates feasible 15-minute start-time candidates for every
-job, enforces time windows, shift boundaries, worker skills, and nonoverlapping constraints,
-then minimizes a configurable combination of normalized Heat Load and delay with weighted priority. See [Architecture](docs/architecture.md) for detailed design.
+- Multiple heterogeneous crews, exactly-once assignment, skill/shift/deadline and
+  service-availability constraints; independently validated returned schedules.
+- Operations-first, heat-first, balanced and explicit extra-delay-budget policies.
+- Optional depot-to-first / consecutive-task travel using estimated geography or
+  directed travel-time overrides. Route lines show order, not road navigation.
+- Offline Phoenix snapshot and clearly labeled synthetic scenarios; optional
+  FortyGuard and Open-Meteo providers with provenance and visible fallback.
+- Per-crew timelines, locations, temperature curves, utilization, status/gap and
+  comparison metrics; schedule CSV/JSON and comparison/metrics JSON downloads.
+- Seeded scenario generator, fixed benchmark manifest, failure-inclusive reports,
+  confidence intervals, build/solve timings and scalability experiments.
 
 ## Quick start
 
-Requirements: Python 3.11 or 3.12.
+Python 3.11 or 3.12:
 
 ```bash
 git clone https://github.com/MichelleHan7/HeatOps.git
 cd HeatOps
+git switch feature/heatops-v2-results
 python -m venv .venv
 source .venv/bin/activate
-python -m pip install --upgrade pip
 python -m pip install -e ".[demo,dev]"
-streamlit run app.py
+python -m streamlit run app.py
 ```
 
-The dashboard opens with the bundled Phoenix snapshot, so no API key is needed
-for the default demo.
+No API key is needed. `requirements.txt` installs the dashboard extra for
+Streamlit Community Cloud. Dev extras include plotting for benchmark reports.
 
-### CLI evaluation
+## CLI and scenarios
 
 ```bash
-heatops-evaluate --mode heat_first
-heatops-evaluate --mode balanced --format json
-heatops-evaluate --heat-priority 75
+# Historical single-crew behavior is unchanged.
+heatops-evaluate --mode heat_first --format json
+
+# Fleet evaluation of bundled Phoenix jobs and both existing crews.
+heatops-evaluate --all-workers --policy delay_budget --delay-budget 60 --format json
+
+# Generate an explicitly synthetic 100-job, 10-crew workload.
+python scripts/generate_scenarios.py --jobs 100 --crews 10 --seed 42 --output reports/scenario.json
+heatops-evaluate --scenario reports/scenario.json --policy balanced --time-limit 30 --format json
+
+# Optional travel on a small workload.
+heatops-evaluate --all-workers --policy heat_first --travel
 ```
 
-Valid presets are `operations_first`, `balanced`, and `heat_first`. The custom
-control assigns the selected percentage to Heat Load and the remainder to delay with weighted priority.
+The delay budget is **additional priority-weighted minutes**, not minutes on the
+wall clock. A v2 scenario bundle contains `jobs`, `workers`, `temperature_matrix`,
+`metadata` and an optional independently checked `witness`. Existing separate
+JSON input flags also work with `--all-workers`. Legacy `--heat-priority` remains
+available on the original single-crew path.
 
-## Live FortyGuard data
+The dashboard accepts scenario JSON or jobs CSV + workers CSV + temperature JSON.
+CSV columns match the Job/Worker dataclasses; worker skills use `;` separators and
+optional `unavailable` is a JSON array of `[start,end]` pairs. Uploaded temperature
+sources are labeled unverified unless declared in bundle metadata. The synthetic
+generator rejects workloads too large for its crew capacity rather than silently
+dropping jobs. `--settings config.json` configures shifts, duration choices,
+priority/intensity ranges, locations, skills, window slack and temperature controls
+(see `GeneratorSettings`). Standard sizes are 5, 10, 25, 50 and 100; crews range from 1 to 10.
 
-Copy the appropriate example and add your own key locally:
+## Evidence and reproduction
+
+The original five-job Phoenix **Heat-first** case remains **40.3827 → 39.1827
+Heat Load (2.9715%)**, using the unchanged 2026-08-24 FortyGuard snapshot. Its raw
+delay rises from 4.5 to 10.25 task-hours; this operational cost is disclosed.
+The original snapshot lacks API activity IDs; provenance has not been invented.
+See `reports/phoenix-baseline.json` and `tests/test_phoenix_demo_scenario.py`.
+
+V2 results are separate synthetic experiments. The preregistered main suite uses
+30 seeds for each of five temperature families, plus scaling and travel cohorts.
+See [executed results](docs/benchmark-results.md), raw `reports/benchmark_results.csv`,
+full assignments in `reports/benchmark_details.jsonl.gz` and environment metadata.
 
 ```bash
-cp .env.example .env
-# or, for Streamlit deployment:
-cp .streamlit/secrets.toml.example .streamlit/secrets.toml
+python scripts/run_benchmarks.py --manifest benchmarks/final.json
+python scripts/profile_scheduler.py
 ```
 
-Then either enable **Refresh from FortyGuard API** in the dashboard or run:
+Full benchmarks take several minutes or longer; they never run on dashboard load
+or normal CI. `--resume` only accepts matching source/manifest hashes. Time limits
+apply to solves; end-to-end runtime also includes model construction. A time-limit
+incumbent is FEASIBLE, never OPTIMAL. Zero-heat baselines produce undefined reduction,
+not an invented percentage. See [verified resume claims](docs/resume-metrics.md).
 
-```bash
-python scripts/fetch_temperature_matrix.py \
-  --jobs data/scenarios/phoenix-demo/jobs.json \
-  --date 2026-08-24 \
-  --output data/temperature_matrix.json
-```
+## Verified v2 results
 
-The API path is asynchronous. HeatOps creates one heatmap per requested time
-slot, polls to completion with bounded retries, spatially matches each job to a
-returned tile, validates the complete matrix, and caches valid results. If a
-live refresh fails, the dashboard retains the validated repository snapshot.
-The full contract is documented in [FortyGuard API integration](docs/api-integration.md).
+The completed suite contains 165 synthetic instances and 660 policy records:
+582 OPTIMAL, 72 FEASIBLE, 5 UNKNOWN, and 1 NOT_RUN. All 654 returned schedules
+passed independent validation. For 100 jobs / 10 crews, 11 of 12 policy attempts
+returned feasible incumbents; none proved optimal within the 30-second solve cap.
 
-Never commit `.env` or `.streamlit/secrets.toml`; both are ignored.
+On the main suite, heat-first achieved **8.47% mean reduction** over **117 valid,
+nonzero-baseline paired cases** (150 scenarios attempted; exclusions disclosed).
+The median was 3.67%. Heat-first also adds scheduling delay; see the full
+[implementation report](docs/final-implementation-report.md) for trade-offs.
+These synthetic results are separate from the preserved 2.97% Phoenix snapshot.
 
-## Demo modes
+## Weather
 
-| Mode | Heat weight | Delay weight | Intended question |
-| --- | ---: | ---: | --- |
-| Operations-first | 0% | 100% | What is the earliest feasible schedule? |
-| Balanced | 50% | 50% | Where is a practical compromise? |
-| Heat-first | 100% | 0% | How far can the modeled Heat Load be reduced? |
-| Custom | 0–100% | Remaining weight | What changes under a chosen policy? |
-
-The Heat priority slider is intentionally enabled only for **Custom** mode;
-presets remain fixed and reproducible.
-
-## Reproducible evidence
-
-The repository separates facts from scenario assumptions:
-
-- Temperatures come from the existing FortyGuard ingestion snapshot. The file
-  checksum, date, AOI, resolution, and provenance live in
-  `data/scenarios/phoenix-demo/metadata.json`.
-- Job locations, time windows, priorities, skills, and physical-intensity
-  multipliers are explicit hackathon demo assumptions.
-- The baseline and HeatOps schedule share the same solver and constraints. The
-  only difference is whether temperature contributes to the objective.
-- Scenario integrity and optimization outcomes are exercised by
-  `tests/test_phoenix_demo_scenario.py`.
-
-## Project structure
-
-```text
-app.py                         Streamlit demo
-src/heatops/domain/            Data models, loaders, and shared configuration
-src/heatops/integrations/      FortyGuard client, AOI, matching, and cache service
-src/heatops/optimization/      Heat Load model, presets, baseline, and CP-SAT solver
-src/heatops/evaluation/        Comparable metrics and job-level explanations
-src/heatops/presentation.py    UI-neutral chart and card records
-data/scenarios/phoenix-demo/   Reproducible jobs, crew, metadata, and temperatures
-scripts/                       Data-fetch and evaluation entry points
-tests/                         Unit, integration, scenario, and UI tests
-docs/                          Architecture and FortyGuard API documentation
-```
+Choose offline data, Open-Meteo or FortyGuard in the fleet workspace. Sources and
+actual data dates are displayed and exported; failures visibly retain scenario
+data. Open-Meteo historical output is reanalysis, not station measurements.
+See [provider contract and terms](docs/weather-providers.md). Keep credentials in
+local environment variables or Streamlit secrets; never commit them.
+The original [FortyGuard integration](docs/api-integration.md) remains available.
 
 ## Quality gates
 
-Run the same checks used by GitHub Actions:
-
 ```bash
-ruff check .
-ruff format --check .
-pytest -q
+python -m ruff check .
+python -m ruff format --check .
+python -m pytest -q
 python -m compileall -q src app.py scripts tests
 heatops-evaluate --mode heat_first --format json
 ```
 
-The tests do not call the live FortyGuard API. Network behavior is exercised
-through controlled fakes, while the end-to-end scenario and Streamlit smoke
-test use repository fixtures.
+CI runs these checks on Python 3.11/3.12. Tests include independent feasibility,
+legacy regression, travel sequencing, weather failures, benchmark smoke tests,
+CLI/export checks and Streamlit AppTest. Unit tests require no API credentials.
 
-## Technical documentation
+## Limits
 
-- [Architecture](docs/architecture.md)
-- [FortyGuard API integration](docs/api-integration.md)
+This is a portfolio scheduling system, not a deployed workforce product. Results
+on synthetic workloads do not establish real-world heat-risk reduction. Larger
+instances can return feasible-but-unproven solutions or no incumbent before timeout.
+Travel mode is guarded at 25 jobs, uses approximate straight-line distances, and
+does not require return to depot. Availability blocks task execution, not travel.
+No cross-midnight jobs, production authentication, persistence or medical advice.
+Optional FastAPI/PostgreSQL work is deferred; core optimization and measurement
+remain the focus. See [design decisions](docs/v2-design-decisions.md).
 
-## Current scope
+## Hackathon history
 
-HeatOps is a decision-support prototype for a single crew and deterministic
-daily planning. It does not claim medical safety guidance, predict heat illness,
-or replace employer heat-safety procedures. Multi-crew routing, travel-time
-optimization, authentication, and production persistence are intentionally
-outside this hackathon submission.
+HeatOps began as a FortyGuard hackathon project in August 2026: one Phoenix crew,
+five utility tasks, Streamlit and a saved API temperature matrix. V2 extends that
+layered Python codebase, retains the original demonstration, and adds workforce
+assignment and reproducible engineering evidence rather than targeting an
+arbitrary improvement percentage.

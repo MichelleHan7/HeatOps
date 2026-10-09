@@ -1,0 +1,891 @@
+{
+  "main/10/2/flat/balanced": {
+    "attempts": 30,
+    "valid_schedules": 29,
+    "successful_solve_rate": 0.9666666666666667,
+    "statuses": {
+      "OPTIMAL": 27,
+      "FEASIBLE": 2,
+      "UNKNOWN": 1
+    },
+    "reduction_n": 28,
+    "undefined_or_failed_pairs": 2,
+    "mean_reduction_percent": 0.07556000904408651,
+    "median_reduction_percent": 0.0039037701684900014,
+    "sd_reduction_percent": 0.1216722701905125,
+    "mean_reduction_ci95": [
+      0.03417809228653154,
+      0.12466985885589277
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 0.39812764102639925,
+    "median_runtime_seconds": 0.6684841645001143,
+    "p95_runtime_seconds": 4.575734643050075,
+    "baseline_optimal_n": 29
+  },
+  "main/10/2/flat/delay_budget": {
+    "attempts": 30,
+    "valid_schedules": 27,
+    "successful_solve_rate": 0.9,
+    "statuses": {
+      "FEASIBLE": 4,
+      "OPTIMAL": 23,
+      "UNKNOWN": 2,
+      "NOT_RUN": 1
+    },
+    "reduction_n": 27,
+    "undefined_or_failed_pairs": 3,
+    "mean_reduction_percent": 0.16687609446699517,
+    "median_reduction_percent": 0.13857194033249523,
+    "sd_reduction_percent": 0.15383735419378883,
+    "mean_reduction_ci95": [
+      0.11285136608154425,
+      0.22683030809695362
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 0.5879243284372673,
+    "median_runtime_seconds": 1.0274811290000798,
+    "p95_runtime_seconds": 5.031006771000056,
+    "baseline_optimal_n": 29
+  },
+  "main/10/2/flat/heat_first": {
+    "attempts": 30,
+    "valid_schedules": 30,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 24,
+      "FEASIBLE": 6
+    },
+    "reduction_n": 29,
+    "undefined_or_failed_pairs": 1,
+    "mean_reduction_percent": 0.30096382124669097,
+    "median_reduction_percent": 0.2696321394778005,
+    "sd_reduction_percent": 0.19301064641784813,
+    "mean_reduction_ci95": [
+      0.23455719454061874,
+      0.3716623602518779
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 0.7448038226051527,
+    "median_runtime_seconds": 1.2054522404999943,
+    "p95_runtime_seconds": 9.278396517450041,
+    "baseline_optimal_n": 29
+  },
+  "main/10/2/flat/operations_first": {
+    "attempts": 30,
+    "valid_schedules": 29,
+    "successful_solve_rate": 0.9666666666666667,
+    "statuses": {
+      "OPTIMAL": 29,
+      "UNKNOWN": 1
+    },
+    "reduction_n": 29,
+    "undefined_or_failed_pairs": 1,
+    "mean_reduction_percent": 0.0,
+    "median_reduction_percent": 0.0,
+    "sd_reduction_percent": 0.0,
+    "mean_reduction_ci95": [
+      0.0,
+      0.0
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 0.0,
+    "median_runtime_seconds": 0.6059412150000298,
+    "p95_runtime_seconds": 11.776396281699848,
+    "baseline_optimal_n": 29
+  },
+  "main/10/2/hot/balanced": {
+    "attempts": 30,
+    "valid_schedules": 30,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 26,
+      "FEASIBLE": 4
+    },
+    "reduction_n": 30,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 2.1017012995375253,
+    "median_reduction_percent": 1.581264315927589,
+    "sd_reduction_percent": 2.7157269915888334,
+    "mean_reduction_ci95": [
+      1.2908061723692679,
+      3.1885671627385945
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 13.383728922453294,
+    "median_runtime_seconds": 0.5906499250002071,
+    "p95_runtime_seconds": 5.034122327350121,
+    "baseline_optimal_n": 30
+  },
+  "main/10/2/hot/delay_budget": {
+    "attempts": 30,
+    "valid_schedules": 30,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 25,
+      "FEASIBLE": 5
+    },
+    "reduction_n": 30,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 2.5575093569320844,
+    "median_reduction_percent": 1.809597988764311,
+    "sd_reduction_percent": 2.5150838230671804,
+    "mean_reduction_ci95": [
+      1.7454668810155642,
+      3.483953285093825
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 11.58931203248951,
+    "median_runtime_seconds": 0.8715955645000122,
+    "p95_runtime_seconds": 5.038075351850114,
+    "baseline_optimal_n": 30
+  },
+  "main/10/2/hot/heat_first": {
+    "attempts": 30,
+    "valid_schedules": 30,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 26,
+      "FEASIBLE": 4
+    },
+    "reduction_n": 30,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 4.295618845427083,
+    "median_reduction_percent": 3.6195969165053863,
+    "sd_reduction_percent": 3.221964995044074,
+    "mean_reduction_ci95": [
+      3.2528280528578595,
+      5.467360519606335
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 14.991691622908634,
+    "median_runtime_seconds": 0.7190094405000309,
+    "p95_runtime_seconds": 5.025728177349992,
+    "baseline_optimal_n": 30
+  },
+  "main/10/2/hot/operations_first": {
+    "attempts": 30,
+    "valid_schedules": 30,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 30
+    },
+    "reduction_n": 30,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 0.0,
+    "median_reduction_percent": 0.0,
+    "sd_reduction_percent": 0.0,
+    "mean_reduction_ci95": [
+      0.0,
+      0.0
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 0.0,
+    "median_runtime_seconds": 0.3979367714999853,
+    "p95_runtime_seconds": 4.423006948299939,
+    "baseline_optimal_n": 30
+  },
+  "main/10/2/mild/balanced": {
+    "attempts": 30,
+    "valid_schedules": 30,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 30
+    },
+    "reduction_n": 0,
+    "undefined_or_failed_pairs": 30,
+    "mean_reduction_percent": null,
+    "median_reduction_percent": null,
+    "sd_reduction_percent": null,
+    "mean_reduction_ci95": null,
+    "worst_reduction_percent": null,
+    "best_reduction_percent": null,
+    "median_runtime_seconds": 0.3253546280000137,
+    "p95_runtime_seconds": 2.8226883814999,
+    "baseline_optimal_n": 30
+  },
+  "main/10/2/mild/delay_budget": {
+    "attempts": 30,
+    "valid_schedules": 30,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 29,
+      "FEASIBLE": 1
+    },
+    "reduction_n": 0,
+    "undefined_or_failed_pairs": 30,
+    "mean_reduction_percent": null,
+    "median_reduction_percent": null,
+    "sd_reduction_percent": null,
+    "mean_reduction_ci95": null,
+    "worst_reduction_percent": null,
+    "best_reduction_percent": null,
+    "median_runtime_seconds": 0.5509427230000483,
+    "p95_runtime_seconds": 4.250781863300062,
+    "baseline_optimal_n": 30
+  },
+  "main/10/2/mild/heat_first": {
+    "attempts": 30,
+    "valid_schedules": 30,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 29,
+      "FEASIBLE": 1
+    },
+    "reduction_n": 0,
+    "undefined_or_failed_pairs": 30,
+    "mean_reduction_percent": null,
+    "median_reduction_percent": null,
+    "sd_reduction_percent": null,
+    "mean_reduction_ci95": null,
+    "worst_reduction_percent": null,
+    "best_reduction_percent": null,
+    "median_runtime_seconds": 0.41523384999993596,
+    "p95_runtime_seconds": 3.579666664299906,
+    "baseline_optimal_n": 30
+  },
+  "main/10/2/mild/operations_first": {
+    "attempts": 30,
+    "valid_schedules": 30,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 30
+    },
+    "reduction_n": 0,
+    "undefined_or_failed_pairs": 30,
+    "mean_reduction_percent": null,
+    "median_reduction_percent": null,
+    "sd_reduction_percent": null,
+    "mean_reduction_ci95": null,
+    "worst_reduction_percent": null,
+    "best_reduction_percent": null,
+    "median_runtime_seconds": 0.3096998839999969,
+    "p95_runtime_seconds": 2.016358805200024,
+    "baseline_optimal_n": 30
+  },
+  "main/10/2/spatial/balanced": {
+    "attempts": 30,
+    "valid_schedules": 30,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 29,
+      "FEASIBLE": 1
+    },
+    "reduction_n": 30,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 4.1134834521191825,
+    "median_reduction_percent": 2.037260058767095,
+    "sd_reduction_percent": 7.115829946561201,
+    "mean_reduction_ci95": [
+      2.0030365214206594,
+      6.946052787115669
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 32.0715507383296,
+    "median_runtime_seconds": 0.46163253300005636,
+    "p95_runtime_seconds": 3.7343728378499663,
+    "baseline_optimal_n": 29
+  },
+  "main/10/2/spatial/delay_budget": {
+    "attempts": 30,
+    "valid_schedules": 30,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 29,
+      "FEASIBLE": 1
+    },
+    "reduction_n": 30,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 4.624703338797223,
+    "median_reduction_percent": 2.6683572782797835,
+    "sd_reduction_percent": 6.539979593006159,
+    "mean_reduction_ci95": [
+      2.647477950949676,
+      7.2275049961052815
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 27.945619963585937,
+    "median_runtime_seconds": 0.6202104640000243,
+    "p95_runtime_seconds": 3.0666605905499855,
+    "baseline_optimal_n": 29
+  },
+  "main/10/2/spatial/heat_first": {
+    "attempts": 30,
+    "valid_schedules": 30,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 28,
+      "FEASIBLE": 2
+    },
+    "reduction_n": 30,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 8.530157621536878,
+    "median_reduction_percent": 6.046819926040733,
+    "sd_reduction_percent": 10.263721698478435,
+    "mean_reduction_ci95": [
+      5.441893431270897,
+      12.699055513650155
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 49.42566678919727,
+    "median_runtime_seconds": 0.4135734855000237,
+    "p95_runtime_seconds": 4.424948249749976,
+    "baseline_optimal_n": 29
+  },
+  "main/10/2/spatial/operations_first": {
+    "attempts": 30,
+    "valid_schedules": 30,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 29,
+      "FEASIBLE": 1
+    },
+    "reduction_n": 30,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 0.0,
+    "median_reduction_percent": 0.0,
+    "sd_reduction_percent": 0.0,
+    "mean_reduction_ci95": [
+      0.0,
+      0.0
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 0.0,
+    "median_runtime_seconds": 0.2886111704999621,
+    "p95_runtime_seconds": 2.3538541589499546,
+    "baseline_optimal_n": 29
+  },
+  "main/10/2/variable/balanced": {
+    "attempts": 30,
+    "valid_schedules": 30,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 29,
+      "FEASIBLE": 1
+    },
+    "reduction_n": 28,
+    "undefined_or_failed_pairs": 2,
+    "mean_reduction_percent": 8.593457248219869,
+    "median_reduction_percent": 3.243768418385975,
+    "sd_reduction_percent": 13.412765046888227,
+    "mean_reduction_ci95": [
+      4.162373921587699,
+      14.061586669941125
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 43.80338665409659,
+    "median_runtime_seconds": 0.45286911350001446,
+    "p95_runtime_seconds": 3.882518840650037,
+    "baseline_optimal_n": 29
+  },
+  "main/10/2/variable/delay_budget": {
+    "attempts": 30,
+    "valid_schedules": 30,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 28,
+      "FEASIBLE": 2
+    },
+    "reduction_n": 28,
+    "undefined_or_failed_pairs": 2,
+    "mean_reduction_percent": 10.119381495141454,
+    "median_reduction_percent": 4.838144303048246,
+    "sd_reduction_percent": 14.272074263790936,
+    "mean_reduction_ci95": [
+      5.518724368879106,
+      15.882922752627561
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 58.03279479459056,
+    "median_runtime_seconds": 0.6336524605001159,
+    "p95_runtime_seconds": 4.727127052799992,
+    "baseline_optimal_n": 29
+  },
+  "main/10/2/variable/heat_first": {
+    "attempts": 30,
+    "valid_schedules": 30,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 29,
+      "FEASIBLE": 1
+    },
+    "reduction_n": 28,
+    "undefined_or_failed_pairs": 2,
+    "mean_reduction_percent": 21.333563159031154,
+    "median_reduction_percent": 16.498998482232437,
+    "sd_reduction_percent": 22.622869787976885,
+    "mean_reduction_ci95": [
+      13.745959359634018,
+      30.12753123079809
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 100.0,
+    "median_runtime_seconds": 0.33340540599988344,
+    "p95_runtime_seconds": 2.598020938950067,
+    "baseline_optimal_n": 29
+  },
+  "main/10/2/variable/operations_first": {
+    "attempts": 30,
+    "valid_schedules": 30,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 29,
+      "FEASIBLE": 1
+    },
+    "reduction_n": 28,
+    "undefined_or_failed_pairs": 2,
+    "mean_reduction_percent": 0.0,
+    "median_reduction_percent": 0.0,
+    "sd_reduction_percent": 0.0,
+    "mean_reduction_ci95": [
+      0.0,
+      0.0
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 0.0,
+    "median_runtime_seconds": 0.4306364259999782,
+    "p95_runtime_seconds": 3.076713820100131,
+    "baseline_optimal_n": 29
+  },
+  "scaling/100/10/hot/balanced": {
+    "attempts": 3,
+    "valid_schedules": 3,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "FEASIBLE": 3
+    },
+    "reduction_n": 3,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 0.06729009322733996,
+    "median_reduction_percent": 0.0,
+    "sd_reduction_percent": 0.12734361173843192,
+    "mean_reduction_ci95": [
+      -0.012292188864035554,
+      0.21416246854605545
+    ],
+    "worst_reduction_percent": -0.012292188864035554,
+    "best_reduction_percent": 0.21416246854605545,
+    "median_runtime_seconds": 30.57796534099998,
+    "p95_runtime_seconds": 30.785471898799916,
+    "baseline_optimal_n": 0
+  },
+  "scaling/100/10/hot/delay_budget": {
+    "attempts": 3,
+    "valid_schedules": 2,
+    "successful_solve_rate": 0.6666666666666666,
+    "statuses": {
+      "UNKNOWN": 1,
+      "FEASIBLE": 2
+    },
+    "reduction_n": 2,
+    "undefined_or_failed_pairs": 1,
+    "mean_reduction_percent": 0.168388266535775,
+    "median_reduction_percent": 0.168388266535775,
+    "sd_reduction_percent": 0.23813697027938857,
+    "mean_reduction_ci95": [
+      0.0,
+      0.33677653307155
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 0.33677653307155,
+    "median_runtime_seconds": 30.163835069000015,
+    "p95_runtime_seconds": 31.004924316200025,
+    "baseline_optimal_n": 0
+  },
+  "scaling/100/10/hot/heat_first": {
+    "attempts": 3,
+    "valid_schedules": 3,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "FEASIBLE": 3
+    },
+    "reduction_n": 3,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 0.39019834212097276,
+    "median_reduction_percent": 0.06737251390436959,
+    "sd_reduction_percent": 0.6184152039864804,
+    "mean_reduction_ci95": [
+      0.0,
+      1.1032225124585489
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 1.1032225124585489,
+    "median_runtime_seconds": 30.339691841999866,
+    "p95_runtime_seconds": 30.463998861900063,
+    "baseline_optimal_n": 0
+  },
+  "scaling/100/10/hot/operations_first": {
+    "attempts": 3,
+    "valid_schedules": 3,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "FEASIBLE": 3
+    },
+    "reduction_n": 3,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 0.0,
+    "median_reduction_percent": 0.0,
+    "sd_reduction_percent": 0.0,
+    "mean_reduction_ci95": [
+      0.0,
+      0.0
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 0.0,
+    "median_runtime_seconds": 30.31785899600004,
+    "p95_runtime_seconds": 30.704621654300013,
+    "baseline_optimal_n": 0
+  },
+  "scaling/25/5/hot/balanced": {
+    "attempts": 3,
+    "valid_schedules": 3,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "FEASIBLE": 3
+    },
+    "reduction_n": 3,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 0.9769379954034595,
+    "median_reduction_percent": 0.8731793378185279,
+    "sd_reduction_percent": 1.0327339835763778,
+    "mean_reduction_ci95": [
+      0.0,
+      2.0576346483918506
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 2.0576346483918506,
+    "median_runtime_seconds": 30.091599266999992,
+    "p95_runtime_seconds": 30.121912761000157,
+    "baseline_optimal_n": 0
+  },
+  "scaling/25/5/hot/delay_budget": {
+    "attempts": 3,
+    "valid_schedules": 3,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "FEASIBLE": 3
+    },
+    "reduction_n": 3,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 0.7879975942824545,
+    "median_reduction_percent": 0.25170769941704535,
+    "sd_reduction_percent": 0.9734569870308264,
+    "mean_reduction_ci95": [
+      0.20062318652904118,
+      1.9116618969012766
+    ],
+    "worst_reduction_percent": 0.20062318652904115,
+    "best_reduction_percent": 1.9116618969012769,
+    "median_runtime_seconds": 30.04915285900006,
+    "p95_runtime_seconds": 30.09878450290007,
+    "baseline_optimal_n": 0
+  },
+  "scaling/25/5/hot/heat_first": {
+    "attempts": 3,
+    "valid_schedules": 3,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "FEASIBLE": 3
+    },
+    "reduction_n": 3,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 3.0695166080401157,
+    "median_reduction_percent": 2.5206854839345842,
+    "sd_reduction_percent": 1.5144420594321353,
+    "mean_reduction_ci95": [
+      1.9060089978451982,
+      4.781855342340565
+    ],
+    "worst_reduction_percent": 1.9060089978451982,
+    "best_reduction_percent": 4.781855342340565,
+    "median_runtime_seconds": 30.07119623099993,
+    "p95_runtime_seconds": 30.09433122240007,
+    "baseline_optimal_n": 0
+  },
+  "scaling/25/5/hot/operations_first": {
+    "attempts": 3,
+    "valid_schedules": 3,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "FEASIBLE": 3
+    },
+    "reduction_n": 3,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 0.0,
+    "median_reduction_percent": 0.0,
+    "sd_reduction_percent": 0.0,
+    "mean_reduction_ci95": [
+      0.0,
+      0.0
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 0.0,
+    "median_runtime_seconds": 30.052793474000055,
+    "p95_runtime_seconds": 30.061414565899963,
+    "baseline_optimal_n": 0
+  },
+  "scaling/5/1/hot/balanced": {
+    "attempts": 3,
+    "valid_schedules": 3,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 3
+    },
+    "reduction_n": 3,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 10.611380912139664,
+    "median_reduction_percent": 0.0,
+    "sd_reduction_percent": 18.379450878292477,
+    "mean_reduction_ci95": [
+      0.0,
+      31.834142736418993
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 31.834142736418993,
+    "median_runtime_seconds": 0.029082360000074914,
+    "p95_runtime_seconds": 0.0369047838000597,
+    "baseline_optimal_n": 3
+  },
+  "scaling/5/1/hot/delay_budget": {
+    "attempts": 3,
+    "valid_schedules": 3,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 3
+    },
+    "reduction_n": 3,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 10.611380912139664,
+    "median_reduction_percent": 0.0,
+    "sd_reduction_percent": 18.379450878292477,
+    "mean_reduction_ci95": [
+      0.0,
+      31.834142736418993
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 31.834142736418993,
+    "median_runtime_seconds": 0.03506604900007915,
+    "p95_runtime_seconds": 0.05417339279997577,
+    "baseline_optimal_n": 3
+  },
+  "scaling/5/1/hot/heat_first": {
+    "attempts": 3,
+    "valid_schedules": 3,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 3
+    },
+    "reduction_n": 3,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 12.337558139665296,
+    "median_reduction_percent": 4.7113629933021075,
+    "sd_reduction_percent": 17.448862979080438,
+    "mean_reduction_ci95": [
+      0.0,
+      32.301311425693775
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 32.301311425693775,
+    "median_runtime_seconds": 0.029619056000001365,
+    "p95_runtime_seconds": 0.03351487879995148,
+    "baseline_optimal_n": 3
+  },
+  "scaling/5/1/hot/operations_first": {
+    "attempts": 3,
+    "valid_schedules": 3,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 3
+    },
+    "reduction_n": 3,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 0.0,
+    "median_reduction_percent": 0.0,
+    "sd_reduction_percent": 0.0,
+    "mean_reduction_ci95": [
+      0.0,
+      0.0
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 0.0,
+    "median_runtime_seconds": 0.040025158999924315,
+    "p95_runtime_seconds": 0.04098917150008674,
+    "baseline_optimal_n": 3
+  },
+  "scaling/50/5/hot/balanced": {
+    "attempts": 3,
+    "valid_schedules": 3,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "FEASIBLE": 3
+    },
+    "reduction_n": 3,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 0.3144476697687317,
+    "median_reduction_percent": 0.27391704226306296,
+    "sd_reduction_percent": 0.3365484068635752,
+    "mean_reduction_ci95": [
+      0.0,
+      0.6694259670431318
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 0.669425967043132,
+    "median_runtime_seconds": 30.158388045000038,
+    "p95_runtime_seconds": 30.18431659680009,
+    "baseline_optimal_n": 0
+  },
+  "scaling/50/5/hot/delay_budget": {
+    "attempts": 3,
+    "valid_schedules": 3,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "FEASIBLE": 3
+    },
+    "reduction_n": 3,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 0.2927106928241545,
+    "median_reduction_percent": 0.3708158978408156,
+    "sd_reduction_percent": 0.1548334392814804,
+    "mean_reduction_ci95": [
+      0.11438111220489972,
+      0.39293506842674836
+    ],
+    "worst_reduction_percent": 0.11438111220489972,
+    "best_reduction_percent": 0.39293506842674836,
+    "median_runtime_seconds": 30.099158176000174,
+    "p95_runtime_seconds": 30.140447034999944,
+    "baseline_optimal_n": 0
+  },
+  "scaling/50/5/hot/heat_first": {
+    "attempts": 3,
+    "valid_schedules": 3,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "FEASIBLE": 3
+    },
+    "reduction_n": 3,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 0.9718568788324164,
+    "median_reduction_percent": 0.8248350560022433,
+    "sd_reduction_percent": 0.5614545628387387,
+    "mean_reduction_ci95": [
+      0.4985408854218452,
+      1.592194695073161
+    ],
+    "worst_reduction_percent": 0.4985408854218452,
+    "best_reduction_percent": 1.592194695073161,
+    "median_runtime_seconds": 30.135364651999907,
+    "p95_runtime_seconds": 30.163901538799927,
+    "baseline_optimal_n": 0
+  },
+  "scaling/50/5/hot/operations_first": {
+    "attempts": 3,
+    "valid_schedules": 3,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "FEASIBLE": 3
+    },
+    "reduction_n": 3,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 0.0,
+    "median_reduction_percent": 0.0,
+    "sd_reduction_percent": 0.0,
+    "mean_reduction_ci95": [
+      0.0,
+      0.0
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 0.0,
+    "median_runtime_seconds": 30.12696004999998,
+    "p95_runtime_seconds": 30.55757307889985,
+    "baseline_optimal_n": 0
+  },
+  "travel/5/2/hot/balanced": {
+    "attempts": 3,
+    "valid_schedules": 3,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 3
+    },
+    "reduction_n": 3,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 0.0,
+    "median_reduction_percent": 0.0,
+    "sd_reduction_percent": 0.0,
+    "mean_reduction_ci95": [
+      0.0,
+      0.0
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 0.0,
+    "median_runtime_seconds": 0.016633396999964134,
+    "p95_runtime_seconds": 0.042977018899983926,
+    "baseline_optimal_n": 3
+  },
+  "travel/5/2/hot/delay_budget": {
+    "attempts": 3,
+    "valid_schedules": 3,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 3
+    },
+    "reduction_n": 3,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 0.22705347954091382,
+    "median_reduction_percent": 0.0,
+    "sd_reduction_percent": 0.39326816260016334,
+    "mean_reduction_ci95": [
+      0.0,
+      0.6811604386227414
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 0.6811604386227414,
+    "median_runtime_seconds": 0.012237856000012926,
+    "p95_runtime_seconds": 0.03963903189996358,
+    "baseline_optimal_n": 3
+  },
+  "travel/5/2/hot/heat_first": {
+    "attempts": 3,
+    "valid_schedules": 3,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 3
+    },
+    "reduction_n": 3,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 2.3272860493072938,
+    "median_reduction_percent": 2.8798195907340096,
+    "sd_reduction_percent": 1.5408968227551056,
+    "mean_reduction_ci95": [
+      0.5863032540432319,
+      3.5157353031446394
+    ],
+    "worst_reduction_percent": 0.5863032540432319,
+    "best_reduction_percent": 3.5157353031446394,
+    "median_runtime_seconds": 0.01797369999997045,
+    "p95_runtime_seconds": 0.06030862179999871,
+    "baseline_optimal_n": 3
+  },
+  "travel/5/2/hot/operations_first": {
+    "attempts": 3,
+    "valid_schedules": 3,
+    "successful_solve_rate": 1.0,
+    "statuses": {
+      "OPTIMAL": 3
+    },
+    "reduction_n": 3,
+    "undefined_or_failed_pairs": 0,
+    "mean_reduction_percent": 0.0,
+    "median_reduction_percent": 0.0,
+    "sd_reduction_percent": 0.0,
+    "mean_reduction_ci95": [
+      0.0,
+      0.0
+    ],
+    "worst_reduction_percent": 0.0,
+    "best_reduction_percent": 0.0,
+    "median_runtime_seconds": 0.014768435000007685,
+    "p95_runtime_seconds": 0.06919159249998756,
+    "baseline_optimal_n": 3
+  }
+}
