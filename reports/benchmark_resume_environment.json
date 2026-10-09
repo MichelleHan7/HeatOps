@@ -1,0 +1,14 @@
+{
+  "resumed_utc": "2026-10-09T04:53:34.558697+00:00",
+  "completed_instances_before_resume": 161,
+  "source_sha256": "4f86648115bc012edba5a616bd2fe0c541cf0683b05f73603f9f95b3a0be2795",
+  "python": "3.12.14",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "cpu_max": "800000 100000",
+  "packages": {
+    "ortools": "9.15.6755",
+    "numpy": "2.3.5",
+    "heatops": "0.2.0"
+  },
+  "note": "Runtime restored after session pause; source hash, Python, OR-Tools and NumPy match original execution. Editable distribution metadata now reflects pyproject version 0.2.0."
+}

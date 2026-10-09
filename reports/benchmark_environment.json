@@ -1,0 +1,98 @@
+{
+  "manifest_sha256": "08d77930b95904e2706f067083b8cfd412b966e1f1ad149ef266b7b7f1ff4cd1",
+  "source_sha256": "4f86648115bc012edba5a616bd2fe0c541cf0683b05f73603f9f95b3a0be2795",
+  "manifest": {
+    "suite": "held-out-v1",
+    "registered_before_evaluation": true,
+    "solver_time_limit_seconds": 30,
+    "additional_weighted_delay_minutes": 60,
+    "configurations": [
+      {
+        "label": "main",
+        "jobs": 10,
+        "crews": 2,
+        "families": [
+          "mild",
+          "hot",
+          "variable",
+          "flat",
+          "spatial"
+        ],
+        "seed_start": 10000,
+        "instances": 30,
+        "travel": false,
+        "solver_time_limit_seconds": 5
+      },
+      {
+        "label": "scaling",
+        "jobs": 5,
+        "crews": 1,
+        "families": [
+          "hot"
+        ],
+        "seed_start": 20000,
+        "instances": 3,
+        "travel": false
+      },
+      {
+        "label": "scaling",
+        "jobs": 25,
+        "crews": 5,
+        "families": [
+          "hot"
+        ],
+        "seed_start": 20000,
+        "instances": 3,
+        "travel": false
+      },
+      {
+        "label": "scaling",
+        "jobs": 50,
+        "crews": 5,
+        "families": [
+          "hot"
+        ],
+        "seed_start": 20000,
+        "instances": 3,
+        "travel": false
+      },
+      {
+        "label": "scaling",
+        "jobs": 100,
+        "crews": 10,
+        "families": [
+          "hot"
+        ],
+        "seed_start": 20000,
+        "instances": 3,
+        "travel": false
+      },
+      {
+        "label": "travel",
+        "jobs": 5,
+        "crews": 2,
+        "families": [
+          "hot"
+        ],
+        "seed_start": 30000,
+        "instances": 3,
+        "travel": true
+      }
+    ],
+    "execution_workers": 4,
+    "execution_revision": "Full rerun with four single-threaded instances; original serial partial run retained. Workloads/policies/time limits unchanged."
+  },
+  "started_utc": "2026-10-08T23:08:12.349497+00:00",
+  "python": "3.12.14",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "logical_cpus": 9,
+  "solver_threads": 1,
+  "execution_workers": 4,
+  "cgroup_cpu_max": "800000 100000",
+  "packages": {
+    "ortools": "9.15.6755",
+    "numpy": "2.3.5",
+    "heatops": "0.1.0"
+  },
+  "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C"
+}

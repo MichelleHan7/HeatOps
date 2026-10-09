@@ -1,3 +1,37 @@
+# V2 fleet architecture
+
+```mermaid
+flowchart TD
+    Sources["Snapshot, synthetic, weather APIs"] --> Weather["Provenance and hourly matrix"]
+    Inputs["Jobs, skills, shifts, availability"] --> Engine["Fleet CP-SAT engine"]
+    Weather --> Engine
+    Travel["Optional travel sequencing"] --> Engine
+    Engine --> Check["Independent schedule validator"]
+    Check --> Compare["Paired policy metrics"]
+    Compare --> UI["Streamlit, CLI and exports"]
+    Compare --> Reports["Seeded benchmark reports"]
+```
+
+`optimization/multi_crew.py` owns candidate assignment, worker NoOverlap,
+normalization, delay caps and optional circuit sequencing. `optimization/travel.py`
+provides approximate geography and directed travel overrides.
+`evaluation/fleet.py` independently validates returned schedules and computes
+per-worker utilization, deadlines and route metrics. `benchmark/` separates
+scenario construction, checking, experiment execution and reporting.
+`integrations/weather_provider.py` defines the source contract;
+`integrations/open_meteo.py` adds timestamp-preserving weather ingestion.
+`ui/fleet.py` renders and exports these results without duplicating the optimizer.
+
+Legacy functions and Phoenix data remain intact. New results use FleetResult,
+including explicit UNKNOWN/INFEASIBLE status, monotonic build/solve/runtime,
+integer objective bound/gap and model counts. No unfinished solve is reported as
+optimal. See [design decisions](v2-design-decisions.md),
+[methodology](benchmark-methodology.md) and [weather providers](weather-providers.md).
+
+The architecture below describes the preserved historical single-crew path.
+
+---
+
 # HeatOps architecture
 
 HeatOps is organized as a small decision-support system: ingest hyperlocal

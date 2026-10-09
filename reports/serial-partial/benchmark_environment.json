@@ -1,0 +1,94 @@
+{
+  "manifest_sha256": "86886b495c2aefe0327cd2392c180e64e3df62b3a9d8bd5c69a39cc23e321dd1",
+  "source_sha256": "90fa713ce7ce7a1c596819361dca1f14285ff8e42de60a777d56a22a9ee20476",
+  "manifest": {
+    "suite": "held-out-v1",
+    "registered_before_evaluation": true,
+    "solver_time_limit_seconds": 30,
+    "additional_weighted_delay_minutes": 60,
+    "configurations": [
+      {
+        "label": "main",
+        "jobs": 10,
+        "crews": 2,
+        "families": [
+          "mild",
+          "hot",
+          "variable",
+          "flat",
+          "spatial"
+        ],
+        "seed_start": 10000,
+        "instances": 30,
+        "travel": false,
+        "solver_time_limit_seconds": 5
+      },
+      {
+        "label": "scaling",
+        "jobs": 5,
+        "crews": 1,
+        "families": [
+          "hot"
+        ],
+        "seed_start": 20000,
+        "instances": 3,
+        "travel": false
+      },
+      {
+        "label": "scaling",
+        "jobs": 25,
+        "crews": 5,
+        "families": [
+          "hot"
+        ],
+        "seed_start": 20000,
+        "instances": 3,
+        "travel": false
+      },
+      {
+        "label": "scaling",
+        "jobs": 50,
+        "crews": 5,
+        "families": [
+          "hot"
+        ],
+        "seed_start": 20000,
+        "instances": 3,
+        "travel": false
+      },
+      {
+        "label": "scaling",
+        "jobs": 100,
+        "crews": 10,
+        "families": [
+          "hot"
+        ],
+        "seed_start": 20000,
+        "instances": 3,
+        "travel": false
+      },
+      {
+        "label": "travel",
+        "jobs": 5,
+        "crews": 2,
+        "families": [
+          "hot"
+        ],
+        "seed_start": 30000,
+        "instances": 3,
+        "travel": true
+      }
+    ]
+  },
+  "started_utc": "2026-10-08T22:54:58.913043+00:00",
+  "python": "3.12.14",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+  "logical_cpus": 9,
+  "solver_threads": 1,
+  "packages": {
+    "ortools": "9.15.6755",
+    "numpy": "2.3.5",
+    "heatops": "0.1.0"
+  },
+  "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C"
+}
